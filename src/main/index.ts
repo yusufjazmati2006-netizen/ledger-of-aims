@@ -9,6 +9,7 @@ import { coreHandlers } from './ipc/handlers/core';
 import { quranHandlers } from './ipc/handlers/quran';
 import { physiqueHandlers } from './ipc/handlers/physique';
 import { degreeHandlers } from './ipc/handlers/degree';
+import { gameHandlers } from './ipc/handlers/game';
 import { checkPhysiqueMilestones } from './services/milestoneEngine';
 import { handlePhotoProtocol, registerPhotoScheme } from './photo-protocol';
 import { resolvePhotoFile } from './services/photos';
@@ -145,6 +146,7 @@ function openData(): boolean {
     ...quranHandlers(context, broadcast),
     ...physiqueHandlers(context, { photosDir: dataPaths().photos, window: () => mainWindow }),
     ...degreeHandlers(context),
+    ...gameHandlers(context),
     'weighIns.upsert': (input) => {
       const result = core['weighIns.upsert']?.(input);
       for (const milestone of checkPhysiqueMilestones(context))

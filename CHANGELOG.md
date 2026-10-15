@@ -2,6 +2,51 @@
 
 All notable changes, by phase.
 
+## [0.5.0] — Phase 5: Game
+
+### Added
+
+- **Roadmap**: six seeded phases (Foundations → Release) linked to the game milestones,
+  with tasks, optional hour estimates, notes and dependencies. Adding a dependency that
+  would create a loop is refused; a task waiting on unfinished work cannot be ticked
+  and says what it is waiting on. Progress rolls up per phase and overall, weighted by
+  estimate (unestimated tasks count as the average estimate). "You can do now" lists
+  the unblocked tasks in roadmap order.
+- **Next single action**: edited in place at the top of the Game screen and shown on
+  Today.
+- **Learning path**: seeded fundamentals with notes and your own resource links (which
+  open in your browser), and an engine decision log with the reasons.
+- **Practice board**: small projects by status (idea, in progress, finished, shelved)
+  with start/finish dates stamped automatically and lessons learned.
+- **Time**: a timer that survives restarts (and shows in the sidebar while running,
+  with a gentle warning after four hours), manual entries (`45m`, `1.5h`, `1:30`),
+  corrections to any finished entry, weekly hours against a target (6 h by default),
+  and a session log grouped by day with focus sessions marked and filterable. Entries
+  that cross midnight are split across the two days.
+- **Devlog**: dated markdown entries with tags, a write/preview editor, tag filters and
+  search. Raw HTML is ignored and remote images are never loaded.
+- **Steam readiness**: a sectioned checklist with progress. Seeded details are "last
+  known" values flagged **Verify** against the current Steamworks documentation, under
+  a prominent banner; items can be added, edited and flagged by you.
+- Today's Game card: roadmap progress, hours this week, what is up next, and whether a
+  timer is running.
+- Settings → Game (weekly hours target, forgotten-timer threshold).
+- Migration `005_game` (phases, tasks, dependencies, learning items, engine decisions,
+  practice projects, time entries with at most one running timer, devlog, Steam
+  checklist).
+
+### Changed
+
+- Goals now appear in the order of their letters everywhere — A Quran, B Game,
+  C Degree, D Physique — in the sidebar (⌘3 is now Game, ⌘4 Degree, ⌘5 Physique), on Today,
+  in Milestones and in Settings.
+
+### Tests
+
+- 245 unit tests (roadmap cycles, blocking and rollup; time split across midnight and
+  DST; duration parsing; game repository) and 10 end-to-end flows, including a Game
+  flow that restarts the app with a timer running.
+
 ## [0.4.0] — Phase 4: Degree
 
 ### Added

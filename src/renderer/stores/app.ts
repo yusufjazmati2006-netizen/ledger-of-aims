@@ -9,6 +9,8 @@ interface AppState {
   today: string;
   /** "Now" according to the main process clock (which tests may pin). */
   nowIso: string;
+  /** Main-process clock minus the renderer's, so live displays follow the same clock. */
+  clockOffsetMs: number;
   info: AppInfo | null;
   settings: SettingsMap | null;
   recovery: RecoveryInfo | null;
@@ -26,6 +28,7 @@ export const useApp = create<AppState>((set, get) => ({
   error: null,
   today: '',
   nowIso: '',
+  clockOffsetMs: 0,
   info: null,
   settings: null,
   recovery: null,
@@ -41,6 +44,7 @@ export const useApp = create<AppState>((set, get) => ({
         status: 'ready',
         today: boot.today,
         nowIso: boot.nowIso,
+        clockOffsetMs: offsetOf(boot.nowIso),
         info: boot.info,
         settings: boot.settings,
         recovery: null,
@@ -52,7 +56,8 @@ export const useApp = create<AppState>((set, get) => ({
 
   refreshToday: async () => {
     const { today, nowIso } = await api('app.today');
-    set(today !== get().today ? { today, nowIso } : { nowIso });
+    const clockOffsetMs = offsetOf(nowIso);
+    set(today !== get().today ? { today, nowIso, clockOffsetMs } : { nowIso, clockOffsetMs });
   },
 
   refreshSettings: async () => {
@@ -74,6 +79,10 @@ export const useApp = create<AppState>((set, get) => ({
     }
   },
 }));
+
+function offsetOf(nowIso: string): number {
+  return new Date(nowIso).getTime() - Date.now();
+}
 
 export function useSettings(): SettingsMap {
   const settings = useApp((s) => s.settings);

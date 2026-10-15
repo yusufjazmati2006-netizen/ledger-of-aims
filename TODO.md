@@ -7,7 +7,7 @@ Known gaps and follow-ups. Phases refer to the plan in the README.
 - [x] Phase 2 — Quran module and the shared domain layer.
 - [x] Phase 3 — Physique module.
 - [x] Phase 4 — Degree module.
-- [ ] Phase 5 — Game module.
+- [x] Phase 5 — Game module.
 - [ ] Phase 6 — Today actions, shift-aware planner, weekly review.
 - [ ] Phase 7 — Tray, global shortcut, command palettes, notifications.
 - [ ] Phase 8 — Backups, JSON import/export, `.ics` export, search.
@@ -15,7 +15,12 @@ Known gaps and follow-ups. Phases refer to the plan in the README.
 
 ## Known gaps
 
-- The Game goal card shows no progress measure until its module lands (Phase 5).
+- Game: the timer cannot be started from outside the Game screen yet; the tray, global
+  shortcut and palettes (Phase 7) will offer start/stop and `g 45m`.
+- Game: game sessions are not yet proposed into free time; the Phase 6 planner places
+  them alongside study, Quran and training.
+- Game: a devlog "insert this week's summary" (hours, finished tasks) would save typing.
+- Game: roadmap tasks are reordered only by editing; drag-to-reorder could follow.
 - Degree: discounting rules (e.g. "best 100 of 120 credits"), borderline/rounding
   policies and resits are not modelled; add them once Arden's regulations are known.
 - Degree: study sessions are proposed for the next seven days only; the full weekly
@@ -34,5 +39,5 @@ Known gaps and follow-ups. Phases refer to the plan in the README.
   backup location (Phase 8) must also be readable when the database is damaged.
 - macOS-specific visuals (vibrancy, traffic-light alignment) are untested on a real
   Mac — development happens in a Linux container. Please check on first run.
-- The renderer bundle is ~1 MB in one chunk; route-level code splitting could
+- The renderer bundle is ~3 MB in one chunk; route-level code splitting could
   trim start-up work (low priority for a local app).

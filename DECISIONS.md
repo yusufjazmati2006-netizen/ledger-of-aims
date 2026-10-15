@@ -121,6 +121,30 @@ reasoning. Anything here can be revisited; most are editable defaults in the app
 - **Deadlines** count as done once submitted or graded. Overdue items stay in the
   "next three" for 30 days.
 
+## Game module
+
+- **Seeded roadmap** of six phases with dependencies between key tasks; phases link to
+  the seeded game milestones by title so they show the date they lead to. All of it is
+  editable and none of it is a prescription.
+- **Rollup** is weighted by estimated hours; tasks without an estimate count as the
+  average of those with one (or equally when none have estimates), so adding a single
+  estimate never distorts the whole.
+- **One timer at a time**, stored as an open time entry (a partial unique index makes a
+  second impossible), so it survives quitting, crashes and restarts.
+- **Manual entries without a start time**: today's end now (time just spent); an
+  earlier day's sit at midday, shifted earlier if needed to end by midnight.
+- **Durations**: a bare number is minutes; `1.5h`, `1h30` and `1:30` are understood.
+  The same parser will serve the quick-log grammar in Phase 7.
+- **Focus session** is your judgement, ticked when stopping the timer or adding an
+  entry; it is not inferred.
+- **Hours chart** covers the weeks since the plan began (at least four, at most
+  twelve); the average uses full weeks since the start only.
+- **Devlog markdown** is GitHub-flavoured, with raw HTML ignored and images shown as
+  their alt text — loading a remote image would be a network request.
+- **Steam checklist**: item names plus "last known" values, each flagged _Verify
+  against the current Steamworks documentation_; no fee, size or rule is presented as
+  current or guaranteed.
+
 ## Planner rules (used by study proposals now, the full planner in Phase 6)
 
 - Default sleep 8 h, wind-down 30 min, morning routine 30 min, commute 20 min each way,
@@ -147,6 +171,8 @@ reasoning. Anything here can be revisited; most are editable defaults in the app
   No web fonts are bundled.
 - Theme is applied through Electron's `nativeTheme.themeSource`, so vibrancy, the
   title bar and CSS `prefers-color-scheme` always agree.
+- Goals are ordered by their letters everywhere: A Quran, B Game, C Degree,
+  D Physique.
 - Goal accents: Quran — deep teal; Physique — ochre; Degree — oxblood; Game —
   indigo. All text pairings meet WCAG AA in both themes (`npm run contrast`).
 - Global quick-log shortcut default (Phase 7): **Ctrl+Shift+Space**, chosen to avoid

@@ -6,10 +6,13 @@ import {
   formatDate,
   parts,
   monthLong,
+  startOfWeek,
   weekdayLong,
   weekdayShort,
 } from '@shared/domain/time/localDate';
 import { countdown, nextMilestone } from '@shared/domain/milestones/milestones';
+import { availableTasks, rollup } from '@shared/domain/game/roadmap';
+import { weeklyHours } from '@shared/domain/game/time';
 import { trainingStatus } from '@shared/domain/physique/schedule';
 import { sumIntake } from '@shared/domain/physique/nutrition';
 import type { RateStatus } from '@shared/domain/physique/trend';
@@ -17,6 +20,7 @@ import { GOAL_IDS, type GoalId } from '@shared/schemas/common';
 import type { Goal, Milestone, ShiftType } from '@shared/schemas/core';
 import { useSettings, useToday } from '../../stores/app';
 import { useLedger } from '../../lib/useLedger';
+import { useNow } from '../../lib/useNow';
 import { api } from '../../lib/api';
 import { formatWeight } from '../../lib/units';
 import { GOAL_META } from '../../lib/goals';
@@ -174,10 +178,57 @@ function GoalProgress({ goalId }: { goalId: GoalId }) {
   if (goalId === 'quran') return <QuranProgress />;
   if (goalId === 'physique') return <PhysiqueProgress />;
   if (goalId === 'degree') return <DegreeProgress />;
+  return <GameProgress />;
+}
+
+function GameProgress() {
+  const settings = useSettings();
+  const today = useToday();
+  const weekStart = startOfWeek(today, settings.general.weekStartsOn);
+  const roadmap = useLedger('game.roadmap', undefined, { domains: ['game'] });
+  const time = useLedger('time.list', { from: weekStart, to: today }, { domains: ['game'] });
+  const running = useLedger('time.running', undefined, { domains: ['game'] });
+  const now = useNow(60_000);
+  if (!roadmap.data || !time.data) return <div className="mt-4 h-[52px]" />;
+  const { phases, tasks, dependencies } = roadmap.data;
+  const progress = rollup(phases, tasks).overall.progress;
+  const hours = weeklyHours(time.data, today, settings.general.weekStartsOn, 1, now)[0]?.hours ?? 0;
+  const next = availableTasks(phases, tasks, dependencies)[0];
   return (
-    <p className="mt-4 text-[13px] text-ink-muted">
-      Progress tracking for this goal arrives with its module.
-    </p>
+    <div className="mt-4 flex items-center gap-4">
+      <Ring
+        value={progress}
+        size={52}
+        stroke={5}
+        label={`Roadmap ${Math.round(progress * 100)}% complete`}
+      >
+        <span className="tabular text-[11.5px] font-semibold text-ink">
+          {Math.round(progress * 100)}%
+        </span>
+      </Ring>
+      <div className="min-w-0 flex-1">
+        <div className="text-[13.5px] text-ink">
+          <Link to="/game/time" className="underline-offset-2 hover:underline">
+            <span className="font-semibold">{hours.toFixed(1)}</span> of{' '}
+            {settings.game.weeklyHoursTarget} h this week
+          </Link>
+          {running.data ? (
+            <Pill tone="accent" icon="clock" className="ml-2">
+              Timer running
+            </Pill>
+          ) : null}
+        </div>
+        <div className="mt-1 truncate text-[12.5px] text-ink-muted">
+          {next ? (
+            <Link to="/game" className="underline-offset-2 hover:underline">
+              Up next: {next.title}
+            </Link>
+          ) : (
+            'Roadmap complete — or waiting on blocked tasks.'
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 

@@ -60,6 +60,26 @@ import {
   type PlanBlock,
   type StudySession,
 } from '../schemas/degree';
+import {
+  decisionInputSchema,
+  devlogInputSchema,
+  learningInputSchema,
+  manualTimeSchema,
+  phaseInputSchema,
+  projectInputSchema,
+  steamInputSchema,
+  taskInputSchema,
+  type DevlogEntry,
+  type EngineDecision,
+  type LearningItem,
+  type Phase,
+  type PracticeProject,
+  type RoadmapData,
+  type SteamItem,
+  type Task,
+  type TimeEntryRecord,
+} from '../schemas/game';
+import type { Dependency } from '../domain/game/roadmap';
 import { settingsSchemas, type SettingsMap } from '../schemas/settings';
 
 /**
@@ -87,7 +107,8 @@ export type DataDomain =
   | 'nutrition'
   | 'photos'
   | 'degree'
-  | 'plan';
+  | 'plan'
+  | 'game';
 
 interface ChannelSpec {
   input: z.ZodType;
@@ -135,6 +156,7 @@ const settingsUpdateSchema = z.discriminatedUnion('namespace', [
   z.object({ namespace: z.literal('quran'), patch: patchSchema(settingsSchemas.quran) }),
   z.object({ namespace: z.literal('physique'), patch: patchSchema(settingsSchemas.physique) }),
   z.object({ namespace: z.literal('degree'), patch: patchSchema(settingsSchemas.degree) }),
+  z.object({ namespace: z.literal('game'), patch: patchSchema(settingsSchemas.game) }),
   z.object({ namespace: z.literal('planner'), patch: patchSchema(settingsSchemas.planner) }),
   z.object({ namespace: z.literal('window'), patch: patchSchema(settingsSchemas.window) }),
 ]);
@@ -420,6 +442,98 @@ export const contract = {
   'plan.create': { input: planBlockInputSchema, output: out<PlanBlock>(), mutates: ['plan'] },
   'plan.update': { input: planBlockPatchSchema, output: out<PlanBlock>(), mutates: ['plan'] },
   'plan.delete': { input: z.object({ id: idSchema }), output: out<null>(), mutates: ['plan'] },
+
+  // Game — roadmap
+  'game.roadmap': { input: z.void(), output: out<RoadmapData>() },
+  'game.savePhase': { input: phaseInputSchema, output: out<Phase>(), mutates: ['game'] },
+  'game.deletePhase': { input: z.object({ id: idSchema }), output: out<null>(), mutates: ['game'] },
+  'game.saveTask': { input: taskInputSchema, output: out<Task>(), mutates: ['game'] },
+  'game.setTaskDone': {
+    input: z.object({ id: idSchema, done: z.boolean() }),
+    output: out<Task>(),
+    mutates: ['game'],
+  },
+  'game.deleteTask': { input: z.object({ id: idSchema }), output: out<null>(), mutates: ['game'] },
+  'game.addDependency': {
+    input: z.object({ taskId: idSchema, dependsOnId: idSchema }),
+    output: out<Dependency[]>(),
+    mutates: ['game'],
+  },
+  'game.removeDependency': {
+    input: z.object({ taskId: idSchema, dependsOnId: idSchema }),
+    output: out<Dependency[]>(),
+    mutates: ['game'],
+  },
+  // Game — learning, practice, devlog, Steam
+  'game.learning': {
+    input: z.void(),
+    output: out<{ items: LearningItem[]; decisions: EngineDecision[] }>(),
+  },
+  'game.saveLearningItem': {
+    input: learningInputSchema,
+    output: out<LearningItem>(),
+    mutates: ['game'],
+  },
+  'game.deleteLearningItem': {
+    input: z.object({ id: idSchema }),
+    output: out<null>(),
+    mutates: ['game'],
+  },
+  'game.addDecision': {
+    input: decisionInputSchema,
+    output: out<EngineDecision>(),
+    mutates: ['game'],
+  },
+  'game.deleteDecision': {
+    input: z.object({ id: idSchema }),
+    output: out<null>(),
+    mutates: ['game'],
+  },
+  'game.projects': { input: z.void(), output: out<PracticeProject[]>() },
+  'game.saveProject': {
+    input: projectInputSchema,
+    output: out<PracticeProject>(),
+    mutates: ['game'],
+  },
+  'game.deleteProject': {
+    input: z.object({ id: idSchema }),
+    output: out<null>(),
+    mutates: ['game'],
+  },
+  'devlog.list': { input: z.void(), output: out<DevlogEntry[]>() },
+  'devlog.save': { input: devlogInputSchema, output: out<DevlogEntry>(), mutates: ['game'] },
+  'devlog.delete': { input: z.object({ id: idSchema }), output: out<null>(), mutates: ['game'] },
+  'steam.list': { input: z.void(), output: out<SteamItem[]>() },
+  'steam.setDone': {
+    input: z.object({ id: idSchema, done: z.boolean() }),
+    output: out<null>(),
+    mutates: ['game'],
+  },
+  'steam.save': { input: steamInputSchema, output: out<SteamItem>(), mutates: ['game'] },
+  'steam.delete': { input: z.object({ id: idSchema }), output: out<null>(), mutates: ['game'] },
+  // Game — time tracking (the running timer survives restarts)
+  'time.list': {
+    input: z.object({ from: localDateSchema, to: localDateSchema }),
+    output: out<TimeEntryRecord[]>(),
+  },
+  'time.running': { input: z.void(), output: out<TimeEntryRecord | null>() },
+  'time.start': {
+    input: z.object({ note: z.string().max(500).default('') }),
+    output: out<TimeEntryRecord>(),
+    mutates: ['game'],
+  },
+  'time.stop': {
+    input: z.object({ note: z.string().max(500).default(''), focus: z.boolean().default(false) }),
+    output: out<TimeEntryRecord>(),
+    mutates: ['game'],
+  },
+  'time.addManual': { input: manualTimeSchema, output: out<TimeEntryRecord>(), mutates: ['game'] },
+  'time.update': {
+    input: manualTimeSchema.extend({ id: idSchema }),
+    output: out<TimeEntryRecord>(),
+    mutates: ['game'],
+  },
+  'time.delete': { input: z.object({ id: idSchema }), output: out<null>(), mutates: ['game'] },
 
   // Recovery (available when the database could not be opened)
   'recovery.restore': { input: z.object({ path: z.string().min(1) }), output: out<null>() },

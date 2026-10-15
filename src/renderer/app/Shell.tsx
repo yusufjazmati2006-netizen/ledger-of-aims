@@ -3,6 +3,7 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { NAV_ITEMS, SETTINGS_PATH, type NavItem } from '@shared/nav';
 import { Icon, type IconName } from '../design/icons';
 import { cx } from '../lib/cx';
+import { useLedger } from '../lib/useLedger';
 
 const NAV_ICONS: Record<string, IconName> = {
   '/': 'today',
@@ -17,7 +18,15 @@ const NAV_ICONS: Record<string, IconName> = {
   [SETTINGS_PATH]: 'settings',
 };
 
-function NavEntry({ item, index }: { item: NavItem; index?: number }) {
+function NavEntry({
+  item,
+  index,
+  badge,
+}: {
+  item: NavItem;
+  index?: number;
+  badge?: { label: string } | null;
+}) {
   return (
     <NavLink
       to={item.path}
@@ -38,6 +47,14 @@ function NavEntry({ item, index }: { item: NavItem; index?: number }) {
         className={item.goal ? 'text-accent' : undefined}
       />
       <span className="flex-1 truncate">{item.label}</span>
+      {badge ? (
+        <span
+          role="status"
+          aria-label={badge.label}
+          title={badge.label}
+          className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-accent"
+        />
+      ) : null}
       {index !== undefined && index < 9 ? (
         <span className="text-[11px] text-ink-faint opacity-0 transition-opacity group-hover:opacity-100">
           ⌘{index + 1}
@@ -50,6 +67,7 @@ function NavEntry({ item, index }: { item: NavItem; index?: number }) {
 export function Shell() {
   const navigate = useNavigate();
   const location = useLocation();
+  const timer = useLedger('time.running', undefined, { domains: ['game'] });
 
   // The application menu (⌘1–⌘9, Settings…) navigates via main-process events.
   useEffect(
@@ -75,7 +93,12 @@ export function Shell() {
         </div>
         <nav aria-label="Sections" className="flex flex-col gap-0.5 px-3">
           {NAV_ITEMS.map((item, index) => (
-            <NavEntry key={item.path} item={item} index={index} />
+            <NavEntry
+              key={item.path}
+              item={item}
+              index={index}
+              badge={item.path === '/game' && timer.data ? { label: 'Game timer running' } : null}
+            />
           ))}
         </nav>
         <div className="mt-auto flex flex-col gap-0.5 px-3 pb-4">

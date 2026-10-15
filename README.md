@@ -6,7 +6,7 @@ physique — planned around a cafe shift pattern.
 
 Everything stays on your Mac. No accounts, no cloud, no telemetry, no network.
 
-> **Status:** Phases 1–4 of 9 are complete (foundations; Quran; Physique; Degree). See [CHANGELOG.md](CHANGELOG.md)
+> **Status:** Phases 1–5 of 9 are complete (foundations; Quran; Physique; Degree; Game). See [CHANGELOG.md](CHANGELOG.md)
 > for what works today and [TODO.md](TODO.md) for what is still to come.
 
 ## Quick start (developers)

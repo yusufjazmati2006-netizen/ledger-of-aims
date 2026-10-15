@@ -15,7 +15,7 @@ export const idSchema = z.string().min(1).max(64);
 export const goalIdSchema = z.enum(['quran', 'game', 'degree', 'physique']);
 export type GoalId = z.infer<typeof goalIdSchema>;
 
-export const GOAL_IDS: readonly GoalId[] = ['quran', 'physique', 'degree', 'game'];
+export const GOAL_IDS: readonly GoalId[] = ['quran', 'game', 'degree', 'physique'];
 
 /** Trimmed, bounded free text. */
 export const textSchema = (max = 2000) => z.string().trim().max(max);

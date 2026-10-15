@@ -13,6 +13,7 @@ import { Icon } from '../../design/icons';
 import { QuranSettingsSection } from './QuranSettings';
 import { PhysiqueSettingsSection } from './PhysiqueSettings';
 import { DegreeSettingsSection, PlannerSettingsSection } from './DegreePlannerSettings';
+import { GameSettingsSection } from './GameSettings';
 
 function SettingsSection({
   id,
@@ -124,11 +125,11 @@ export function SettingsPage() {
         </SettingsSection>
 
         <SettingsSection
-          id="physique"
-          title="Physique"
-          description="Calorie and protein targets, trend smoothing, rate warnings and training rhythm."
+          id="game"
+          title="Game"
+          description="Your weekly hours target and the forgotten-timer check."
         >
-          <PhysiqueSettingsSection />
+          <GameSettingsSection />
         </SettingsSection>
 
         <SettingsSection
@@ -137,6 +138,14 @@ export function SettingsPage() {
           description="How your classification is calculated, and your weekly study target."
         >
           <DegreeSettingsSection />
+        </SettingsSection>
+
+        <SettingsSection
+          id="physique"
+          title="Physique"
+          description="Calorie and protein targets, trend smoothing, rate warnings and training rhythm."
+        >
+          <PhysiqueSettingsSection />
         </SettingsSection>
 
         <SettingsSection

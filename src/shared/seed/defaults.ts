@@ -30,10 +30,10 @@ export const SEED_GOALS: readonly SeedGoal[] = [
     sortOrder: 0,
   },
   {
-    id: 'physique',
-    title: 'Physique',
-    subtitle: 'A lean, athletic 86 kg',
-    nextAction: '',
+    id: 'game',
+    title: 'First game on Steam',
+    subtitle: 'From zero to a released game',
+    nextAction: 'Write down the three engines you are considering and one reason for each.',
     sortOrder: 1,
   },
   {
@@ -44,10 +44,10 @@ export const SEED_GOALS: readonly SeedGoal[] = [
     sortOrder: 2,
   },
   {
-    id: 'game',
-    title: 'First game on Steam',
-    subtitle: 'From zero to a released game',
-    nextAction: 'Write down the three engines you are considering and one reason for each.',
+    id: 'physique',
+    title: 'Physique',
+    subtitle: 'A lean, athletic 86 kg',
+    nextAction: '',
     sortOrder: 3,
   },
 ];

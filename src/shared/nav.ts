@@ -8,11 +8,13 @@ export interface NavItem {
   goal?: 'quran' | 'game' | 'degree' | 'physique';
 }
 
+/** Goals appear in the order of their letters (A Quran, B Game, C Degree, D Physique). */
 export const NAV_ITEMS: readonly NavItem[] = [
   { path: '/', label: 'Today' },
   { path: '/quran', label: 'Quran', goal: 'quran' },
-  { path: '/physique', label: 'Physique', goal: 'physique' },
+  { path: '/game', label: 'Game', goal: 'game' },
   { path: '/degree', label: 'Degree', goal: 'degree' },
+  { path: '/physique', label: 'Physique', goal: 'physique' },
   { path: '/milestones', label: 'Milestones' },
 ];
 

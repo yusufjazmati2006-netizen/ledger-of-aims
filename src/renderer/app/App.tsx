@@ -28,6 +28,13 @@ import { DegreeOverview } from '../features/degree/DegreeOverview';
 import { ModulesPage } from '../features/degree/ModulesPage';
 import { CalendarPage } from '../features/degree/CalendarPage';
 import { StudyPage } from '../features/degree/StudyPage';
+import { GamePage } from '../features/game/GamePage';
+import { RoadmapPage } from '../features/game/RoadmapPage';
+import { LearningPage } from '../features/game/LearningPage';
+import { PracticePage } from '../features/game/PracticePage';
+import { TimePage } from '../features/game/TimePage';
+import { DevlogPage } from '../features/game/DevlogPage';
+import { SteamPage } from '../features/game/SteamPage';
 
 const router = createHashRouter([
   {
@@ -54,6 +61,18 @@ const router = createHashRouter([
           { path: 'nutrition', element: <NutritionPage /> },
           { path: 'meal-prep', element: <MealPrepPage /> },
           { path: 'photos', element: <PhotosPage /> },
+        ],
+      },
+      {
+        path: 'game',
+        element: <GamePage />,
+        children: [
+          { index: true, element: <RoadmapPage /> },
+          { path: 'learning', element: <LearningPage /> },
+          { path: 'practice', element: <PracticePage /> },
+          { path: 'time', element: <TimePage /> },
+          { path: 'devlog', element: <DevlogPage /> },
+          { path: 'steam', element: <SteamPage /> },
         ],
       },
       {

@@ -121,6 +121,14 @@ export const degreeSettingsSchema = z.object({
 });
 export type DegreeSettings = z.infer<typeof degreeSettingsSchema>;
 
+export const gameSettingsSchema = z.object({
+  /** Weekly hours of game work to aim for; shown as the reference line on the hours chart. */
+  weeklyHoursTarget: z.number().min(0).max(80).default(6),
+  /** A timer left running this long is probably forgotten; the Time tab says so. */
+  longTimerHours: z.number().min(1).max(24).default(4),
+});
+export type GameSettings = z.infer<typeof gameSettingsSchema>;
+
 export const plannerSettingsSchema = z.object({
   commuteMinutes: z.number().int().min(0).max(180).default(20),
   sleepHours: z.number().min(4).max(12).default(8),
@@ -155,6 +163,7 @@ export const settingsSchemas = {
   quran: quranSettingsSchema,
   physique: physiqueSettingsSchema,
   degree: degreeSettingsSchema,
+  game: gameSettingsSchema,
   planner: plannerSettingsSchema,
   window: windowSettingsSchema,
 } as const;
