@@ -12,6 +12,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { path: '/', label: 'Today' },
   { path: '/quran', label: 'Quran', goal: 'quran' },
   { path: '/physique', label: 'Physique', goal: 'physique' },
+  { path: '/degree', label: 'Degree', goal: 'degree' },
   { path: '/milestones', label: 'Milestones' },
 ];
 

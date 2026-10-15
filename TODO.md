@@ -6,7 +6,7 @@ Known gaps and follow-ups. Phases refer to the plan in the README.
 
 - [x] Phase 2 — Quran module and the shared domain layer.
 - [x] Phase 3 — Physique module.
-- [ ] Phase 4 — Degree module.
+- [x] Phase 4 — Degree module.
 - [ ] Phase 5 — Game module.
 - [ ] Phase 6 — Today actions, shift-aware planner, weekly review.
 - [ ] Phase 7 — Tray, global shortcut, command palettes, notifications.
@@ -15,8 +15,11 @@ Known gaps and follow-ups. Phases refer to the plan in the README.
 
 ## Known gaps
 
-- Goal cards for Degree and Game show no progress measure until their modules land
-  (Phases 4, 5).
+- The Game goal card shows no progress measure until its module lands (Phase 5).
+- Degree: discounting rules (e.g. "best 100 of 120 credits"), borderline/rounding
+  policies and resits are not modelled; add them once Arden's regulations are known.
+- Degree: study sessions are proposed for the next seven days only; the full weekly
+  planner (Phase 6) will place all goals together with drag-to-adjust.
 - Physique: an adaptive maintenance estimate (from intake vs trend change) would make
   calorie targets self-correcting; not yet implemented.
 - Physique: photos are backed up with the data folder in Phase 8; JSON export will

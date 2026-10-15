@@ -22,6 +22,8 @@ import { formatWeight } from '../../lib/units';
 import { GOAL_META } from '../../lib/goals';
 import { Card, PageHeader, Pill, type PillTone } from '../../design/Card';
 import { usePhysique } from '../physique/usePhysique';
+import { isDone, useDegree } from '../degree/useDegree';
+import { countdownText, nextDeadlines } from '@shared/domain/degree/deadlines';
 import { Ring } from '../../design/Ring';
 import { useQuran } from '../quran/useQuran';
 import { VERDICT_TONE, verdictHeadline } from '../quran/verdict';
@@ -171,6 +173,7 @@ function GoalCard({
 function GoalProgress({ goalId }: { goalId: GoalId }) {
   if (goalId === 'quran') return <QuranProgress />;
   if (goalId === 'physique') return <PhysiqueProgress />;
+  if (goalId === 'degree') return <DegreeProgress />;
   return (
     <p className="mt-4 text-[13px] text-ink-muted">
       Progress tracking for this goal arrives with its module.
@@ -250,6 +253,47 @@ function PhysiqueProgress() {
           </Link>
         ) : null}
       </div>
+    </div>
+  );
+}
+
+function DegreeProgress() {
+  const today = useToday();
+  const degree = useDegree();
+  if (!degree.ready) return <div className="mt-4 h-[52px]" />;
+  const next = nextDeadlines(
+    degree.deadlines.map((a) => ({ ...a, due: a.dueDate ?? '', done: isDone(a) })),
+    today,
+    1,
+  )[0];
+  const { projection } = degree;
+  return (
+    <div className="mt-4 flex items-start justify-between gap-4">
+      <div className="min-w-0">
+        {next ? (
+          <>
+            <div className="text-[13.5px] text-ink">
+              <span className="font-semibold">{countdownText(today, next.due)}</span> · {next.title}
+            </div>
+            <div className="truncate text-[12.5px] text-ink-muted">{next.module?.title}</div>
+          </>
+        ) : (
+          <p className="text-[13px] text-ink-muted">
+            <Link
+              to="/degree/modules"
+              className="font-medium text-ink underline underline-offset-2"
+            >
+              Add modules and assessments
+            </Link>{' '}
+            to see deadlines and your projected class.
+          </p>
+        )}
+      </div>
+      {projection.projected !== null ? (
+        <Pill tone="accent">
+          Projected {projection.band} · {projection.projected.toFixed(0)}%
+        </Pill>
+      ) : null}
     </div>
   );
 }

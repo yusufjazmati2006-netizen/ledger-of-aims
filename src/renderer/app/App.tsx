@@ -23,6 +23,11 @@ import { TrainingPage } from '../features/physique/TrainingPage';
 import { NutritionPage } from '../features/physique/NutritionPage';
 import { MealPrepPage } from '../features/physique/MealPrepPage';
 import { PhotosPage } from '../features/physique/PhotosPage';
+import { DegreePage } from '../features/degree/DegreePage';
+import { DegreeOverview } from '../features/degree/DegreeOverview';
+import { ModulesPage } from '../features/degree/ModulesPage';
+import { CalendarPage } from '../features/degree/CalendarPage';
+import { StudyPage } from '../features/degree/StudyPage';
 
 const router = createHashRouter([
   {
@@ -49,6 +54,16 @@ const router = createHashRouter([
           { path: 'nutrition', element: <NutritionPage /> },
           { path: 'meal-prep', element: <MealPrepPage /> },
           { path: 'photos', element: <PhotosPage /> },
+        ],
+      },
+      {
+        path: 'degree',
+        element: <DegreePage />,
+        children: [
+          { index: true, element: <DegreeOverview /> },
+          { path: 'modules', element: <ModulesPage /> },
+          { path: 'calendar', element: <CalendarPage /> },
+          { path: 'study', element: <StudyPage /> },
         ],
       },
       { path: 'milestones', element: <MilestonesPage /> },

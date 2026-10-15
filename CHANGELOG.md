@@ -2,6 +2,43 @@
 
 All notable changes, by phase.
 
+## [0.4.0] — Phase 4: Degree
+
+### Added
+
+- **Structure**: three seeded years (Levels 4–6, dates left for you to enter), modules
+  with credits, and assessments with type, weight, due date, status and grade. A grade
+  marks an assessment graded; module templates (100% coursework, 50/50, 40/60).
+- **UK honours projection** from graded work, weighted by credits and by level
+  (editable; Level 5 : Level 6 = 1 : 2 by default with Level 4 not counted), with the
+  share of the final classification already determined.
+- **"What do I need?"** — the exact uniform mark needed on all remaining work for a
+  First, 2:1 and 2:2, reported as secured, achievable or out of reach. Credits not yet
+  entered count as remaining work so the answer is honest early on.
+- **What-if** marks for ungraded assessments, recalculated live and never saved.
+- **Deadlines**: the next three countdowns with escalating urgency (calm / coming up /
+  this week / imminent / overdue — each with colour, icon and label), and a month
+  calendar of assessments and milestones.
+- **Shift-aware free time** (`src/shared/domain/planner/freeTime.ts`): wake after
+  night shifts (sleep + routine), early bedtimes before morning shifts, commute and
+  recovery around shifts, and a warning for short sleep between shifts.
+- **Study planner**: sessions proposed into free windows to meet the weekly target,
+  accepted into the plan, ticked off to log time; weekly hours chart.
+- Settings → Degree (weights, boundaries, credits per level, study target) and
+  Settings → Planner (sleep, commute, wind-down, routine, recovery, day bounds).
+- Today's Degree card: next deadline countdown and projected class.
+- Migration `004_degree` (years, modules, assessments, study sessions, plan blocks).
+
+### Fixed
+
+- An average of exactly 70 computed as 69.999… was classed as a 2:1; class bands now
+  tolerate floating-point error.
+
+### Tests
+
+- 204 unit tests (classification, requirements, what-if, urgency, intervals, free
+  time around every shift combination, session proposals) and 9 end-to-end flows.
+
 ## [0.3.0] — Phase 3: Physique
 
 ### Added

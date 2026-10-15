@@ -12,6 +12,7 @@ import { Button } from '../../design/Button';
 import { Icon } from '../../design/icons';
 import { QuranSettingsSection } from './QuranSettings';
 import { PhysiqueSettingsSection } from './PhysiqueSettings';
+import { DegreeSettingsSection, PlannerSettingsSection } from './DegreePlannerSettings';
 
 function SettingsSection({
   id,
@@ -128,6 +129,22 @@ export function SettingsPage() {
           description="Calorie and protein targets, trend smoothing, rate warnings and training rhythm."
         >
           <PhysiqueSettingsSection />
+        </SettingsSection>
+
+        <SettingsSection
+          id="degree"
+          title="Degree"
+          description="How your classification is calculated, and your weekly study target."
+        >
+          <DegreeSettingsSection />
+        </SettingsSection>
+
+        <SettingsSection
+          id="planner"
+          title="Planner"
+          description="The rules that keep plans realistic around your shifts and sleep."
+        >
+          <PlannerSettingsSection />
         </SettingsSection>
 
         <SettingsSection

@@ -105,6 +105,33 @@ reasoning. Anything here can be revisited; most are editable defaults in the app
   converts HEIC on macOS) and stored in `…/LedgerOfAims/photos/`. They are not stored
   in the database.
 
+## Degree module
+
+- **Classification maths**: module mark = weighted mean of graded assessments; level
+  average = credit-weighted mean of module marks; final = level-weighted mean. Default
+  weights L5 : L6 = 1 : 2, L4 not counted; boundaries 70/60/50/40. These are flagged in
+  the app as unverified for Arden.
+- **No rounding** beyond floating-point tolerance: 69.5 is a 2:1 here; universities
+  that round or use borderline rules differ.
+- **Projection** uses graded work only; the "what do I need" figure treats every
+  ungraded assessment, every module without assessments, and every credit not yet
+  entered (up to 120 a level) as remaining work.
+- **Status follows grades**: entering a grade marks an assessment graded; clearing it
+  returns it to submitted.
+- **Deadlines** count as done once submitted or graded. Overdue items stay in the
+  "next three" for 30 days.
+
+## Planner rules (used by study proposals now, the full planner in Phase 6)
+
+- Default sleep 8 h, wind-down 30 min, morning routine 30 min, commute 20 min each way,
+  30 min recovery after a shift, days run 07:00–23:00.
+- After a night shift ending 01:00, the next day starts at 10:20 (home 01:20, asleep
+  01:50, up 09:50, routine). Before a 07:30 morning shift, plans end by 22:10.
+- A night shift followed by a morning shift leaves 4 h 50 min for sleep and is flagged
+  (threshold 7 h, editable).
+- Study sessions fill days in date order, one per day per round, at most two a day.
+- Plan blocks are generic (any goal) and stored now so Phase 6 builds on the same data.
+
 ## Privacy
 
 - No network access at runtime, enforced by four layers: a session-level request

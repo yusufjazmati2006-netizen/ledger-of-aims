@@ -96,6 +96,44 @@ export const physiqueSettingsSchema = z.object({
 });
 export type PhysiqueSettings = z.infer<typeof physiqueSettingsSchema>;
 
+const boundary = (v: number) => z.number().min(0).max(100).default(v);
+
+export const degreeSettingsSchema = z.object({
+  /** Relative weight of each level in the final classification; 0 = not counted. */
+  levelWeights: z
+    .object({
+      4: z.number().min(0).max(10),
+      5: z.number().min(0).max(10),
+      6: z.number().min(0).max(10),
+    })
+    .default({ 4: 0, 5: 1, 6: 2 }),
+  boundaries: z
+    .object({
+      first: boundary(70),
+      upperSecond: boundary(60),
+      lowerSecond: boundary(50),
+      third: boundary(40),
+    })
+    .default({ first: 70, upperSecond: 60, lowerSecond: 50, third: 40 }),
+  creditsPerLevel: z.number().int().min(20).max(240).default(120),
+  studyHoursPerWeek: z.number().min(0).max(60).default(6),
+  sessionMinutes: z.number().int().min(15).max(240).default(60),
+});
+export type DegreeSettings = z.infer<typeof degreeSettingsSchema>;
+
+export const plannerSettingsSchema = z.object({
+  commuteMinutes: z.number().int().min(0).max(180).default(20),
+  sleepHours: z.number().min(4).max(12).default(8),
+  windDownMinutes: z.number().int().min(0).max(120).default(30),
+  morningRoutineMinutes: z.number().int().min(0).max(120).default(30),
+  postShiftRecoveryMinutes: z.number().int().min(0).max(180).default(30),
+  dayStart: z.string().default('07:00'),
+  dayEnd: z.string().default('23:00'),
+  minWindowMinutes: z.number().int().min(5).max(120).default(20),
+  minSleepBetweenShiftsHours: z.number().min(4).max(10).default(7),
+});
+export type PlannerSettings = z.infer<typeof plannerSettingsSchema>;
+
 export const windowSettingsSchema = z.object({
   bounds: z
     .object({
@@ -116,6 +154,8 @@ export const settingsSchemas = {
   profile: profileSettingsSchema,
   quran: quranSettingsSchema,
   physique: physiqueSettingsSchema,
+  degree: degreeSettingsSchema,
+  planner: plannerSettingsSchema,
   window: windowSettingsSchema,
 } as const;
 

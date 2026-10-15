@@ -7,6 +7,8 @@ interface AppState {
   status: 'loading' | 'ready' | 'recovery' | 'error';
   error: string | null;
   today: string;
+  /** "Now" according to the main process clock (which tests may pin). */
+  nowIso: string;
   info: AppInfo | null;
   settings: SettingsMap | null;
   recovery: RecoveryInfo | null;
@@ -23,6 +25,7 @@ export const useApp = create<AppState>((set, get) => ({
   status: 'loading',
   error: null,
   today: '',
+  nowIso: '',
   info: null,
   settings: null,
   recovery: null,
@@ -37,6 +40,7 @@ export const useApp = create<AppState>((set, get) => ({
       set({
         status: 'ready',
         today: boot.today,
+        nowIso: boot.nowIso,
         info: boot.info,
         settings: boot.settings,
         recovery: null,
@@ -47,8 +51,8 @@ export const useApp = create<AppState>((set, get) => ({
   },
 
   refreshToday: async () => {
-    const { today } = await api('app.today');
-    if (today !== get().today) set({ today });
+    const { today, nowIso } = await api('app.today');
+    set(today !== get().today ? { today, nowIso } : { nowIso });
   },
 
   refreshSettings: async () => {
@@ -79,4 +83,11 @@ export function useSettings(): SettingsMap {
 
 export function useToday(): string {
   return useApp((s) => s.today);
+}
+
+/** Minutes after local midnight right now, by the main-process clock. */
+export function useNowMinute(): number {
+  const nowIso = useApp((s) => s.nowIso);
+  const d = nowIso ? new Date(nowIso) : new Date();
+  return d.getHours() * 60 + d.getMinutes();
 }

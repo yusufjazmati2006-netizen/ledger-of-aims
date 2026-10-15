@@ -46,6 +46,20 @@ import {
   type Workout,
   type WorkoutSet,
 } from '../schemas/physique';
+import {
+  assessmentInputSchema,
+  moduleInputSchema,
+  planBlockInputSchema,
+  planBlockPatchSchema,
+  studyLogSchema,
+  yearPatchSchema,
+  type Assessment,
+  type DegreeData,
+  type DegreeModule,
+  type DegreeYear,
+  type PlanBlock,
+  type StudySession,
+} from '../schemas/degree';
 import { settingsSchemas, type SettingsMap } from '../schemas/settings';
 
 /**
@@ -71,7 +85,9 @@ export type DataDomain =
   | 'quran'
   | 'training'
   | 'nutrition'
-  | 'photos';
+  | 'photos'
+  | 'degree'
+  | 'plan';
 
 interface ChannelSpec {
   input: z.ZodType;
@@ -118,6 +134,8 @@ const settingsUpdateSchema = z.discriminatedUnion('namespace', [
   z.object({ namespace: z.literal('profile'), patch: patchSchema(settingsSchemas.profile) }),
   z.object({ namespace: z.literal('quran'), patch: patchSchema(settingsSchemas.quran) }),
   z.object({ namespace: z.literal('physique'), patch: patchSchema(settingsSchemas.physique) }),
+  z.object({ namespace: z.literal('degree'), patch: patchSchema(settingsSchemas.degree) }),
+  z.object({ namespace: z.literal('planner'), patch: patchSchema(settingsSchemas.planner) }),
   z.object({ namespace: z.literal('window'), patch: patchSchema(settingsSchemas.window) }),
 ]);
 
@@ -353,6 +371,55 @@ export const contract = {
     mutates: ['photos'],
   },
   'photos.delete': { input: z.object({ id: idSchema }), output: out<null>(), mutates: ['photos'] },
+
+  // Degree
+  'degree.data': { input: z.void(), output: out<DegreeData>() },
+  'degree.updateYear': { input: yearPatchSchema, output: out<DegreeYear>(), mutates: ['degree'] },
+  'degree.createModule': {
+    input: moduleInputSchema,
+    output: out<DegreeModule>(),
+    mutates: ['degree'],
+  },
+  'degree.updateModule': {
+    input: z.object({ id: idSchema, patch: patchSchema(moduleInputSchema) }),
+    output: out<DegreeModule>(),
+    mutates: ['degree'],
+  },
+  'degree.deleteModule': {
+    input: z.object({ id: idSchema }),
+    output: out<null>(),
+    mutates: ['degree'],
+  },
+  'degree.createAssessment': {
+    input: assessmentInputSchema,
+    output: out<Assessment>(),
+    mutates: ['degree'],
+  },
+  'degree.updateAssessment': {
+    input: z.object({ id: idSchema, patch: patchSchema(assessmentInputSchema) }),
+    output: out<Assessment>(),
+    mutates: ['degree'],
+  },
+  'degree.deleteAssessment': {
+    input: z.object({ id: idSchema }),
+    output: out<null>(),
+    mutates: ['degree'],
+  },
+  'study.list': {
+    input: z.object({ from: localDateSchema, to: localDateSchema }),
+    output: out<StudySession[]>(),
+  },
+  'study.log': { input: studyLogSchema, output: out<StudySession>(), mutates: ['degree'] },
+  'study.delete': { input: z.object({ id: idSchema }), output: out<null>(), mutates: ['degree'] },
+
+  // Plan blocks (scheduled sessions for any goal)
+  'plan.list': {
+    input: z.object({ from: localDateSchema, to: localDateSchema }),
+    output: out<PlanBlock[]>(),
+  },
+  'plan.create': { input: planBlockInputSchema, output: out<PlanBlock>(), mutates: ['plan'] },
+  'plan.update': { input: planBlockPatchSchema, output: out<PlanBlock>(), mutates: ['plan'] },
+  'plan.delete': { input: z.object({ id: idSchema }), output: out<null>(), mutates: ['plan'] },
 
   // Recovery (available when the database could not be opened)
   'recovery.restore': { input: z.object({ path: z.string().min(1) }), output: out<null>() },

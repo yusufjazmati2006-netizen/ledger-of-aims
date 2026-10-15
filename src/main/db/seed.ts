@@ -89,6 +89,16 @@ export function seedDatabase(ctx: RepoContext): { seeded: string[] } {
       seeded.push('exercises');
     }
 
+    if (isEmpty('degree_years')) {
+      const insert = db.prepare(
+        'INSERT INTO degree_years (id, level, label, sort_order, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
+      );
+      [4, 5, 6].forEach((level, i) => {
+        insert.run(newId(), level, `Year ${i + 1} (Level ${level})`, i, now, now);
+      });
+      seeded.push('degree_years');
+    }
+
     if (isEmpty('foods')) {
       const insert = db.prepare(
         `INSERT INTO foods (id, name, calories, protein_g, serving, ingredients, favourite, sort_order, created_at, updated_at)
