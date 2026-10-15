@@ -1,0 +1,53 @@
+# Packaging for macOS (universal: Apple silicon + Intel). The build is unsigned;
+# see README → "First launch on macOS".
+appId: app.ledgerofaims.desktop
+productName: Ledger of Aims
+copyright: Copyright © 2026 Ledger of Aims
+directories:
+  buildResources: build
+  output: release/${version}
+files:
+  - out/**
+  - package.json
+  - '!**/*.map'
+  # better-sqlite3 ships prebuilt Node-API binaries; the C sources and other
+  # platforms' binaries are not needed at runtime.
+  - '!**/node_modules/better-sqlite3/{deps,src,binding.gyp}/**'
+  - '!**/node_modules/better-sqlite3/prebuilds/{linux,linuxmusl,win32}-*.node'
+asarUnpack:
+  - '**/node_modules/better-sqlite3/**'
+# Prebuilds already exist for every target, so no native rebuild is required.
+npmRebuild: false
+mac:
+  category: public.app-category.productivity
+  icon: build/icon.icns
+  identity: null
+  hardenedRuntime: false
+  darkModeSupport: true
+  target:
+    - target: dmg
+      arch: universal
+    - target: zip
+      arch: universal
+  # Both arch builds contain the same pair of prebuilt binaries (darwin-x64 and
+  # darwin-arm64); the universal merger must keep them as-is rather than lipo them.
+  x64ArchFiles: '**/node_modules/better-sqlite3/prebuilds/*.node'
+  extendInfo:
+    LSApplicationCategoryType: public.app-category.productivity
+dmg:
+  title: Ledger of Aims
+  artifactName: Ledger-of-Aims-${version}-universal.dmg
+  contents:
+    - x: 150
+      y: 190
+    - x: 410
+      y: 190
+      type: link
+      path: /Applications
+  window:
+    width: 560
+    height: 380
+linux:
+  target: dir
+  icon: build/icon.png
+  category: Utility

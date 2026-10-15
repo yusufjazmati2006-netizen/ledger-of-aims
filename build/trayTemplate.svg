@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22">
+  <!-- Menu-bar template image: black + alpha only; macOS tints it for light/dark. -->
+  <g fill="none" stroke="#000" stroke-linecap="round" stroke-width="1.9" transform="rotate(-90 11 11)">
+    <circle cx="11" cy="11" r="8.2" stroke-dasharray="39 51.5"/>
+    <circle cx="11" cy="11" r="4.6" stroke-dasharray="19 28.9"/>
+  </g>
+  <circle cx="11" cy="11" r="1.6" fill="#000"/>
+</svg>

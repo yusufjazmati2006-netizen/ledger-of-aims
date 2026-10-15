@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!--
+    Ledger of Aims — app icon. Four concentric arcs (one per goal, in the goal
+    accents) on warm paper, converging on a single ink point: the aim.
+    Drawn on Apple's 1024 grid: an 824 × 824 rounded square inset by 100.
+  -->
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fbf8f2"/>
+      <stop offset="1" stop-color="#ece5d8"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="125%">
+      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#000" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+  <rect x="100" y="100" width="824" height="824" rx="186" fill="url(#paper)" filter="url(#shadow)"/>
+  <rect x="100.5" y="100.5" width="823" height="823" rx="185.5" fill="none" stroke="#000" stroke-opacity="0.06"/>
+  <g fill="none" stroke-linecap="round" stroke-width="34" transform="rotate(-90 512 512)">
+    <circle cx="512" cy="512" r="300" stroke="#e4ddd0"/>
+    <circle cx="512" cy="512" r="236" stroke="#e4ddd0"/>
+    <circle cx="512" cy="512" r="172" stroke="#e4ddd0"/>
+    <circle cx="512" cy="512" r="108" stroke="#e4ddd0"/>
+    <!-- dasharray = arc length, circumference -->
+    <circle cx="512" cy="512" r="300" stroke="#1d6a5a" stroke-dasharray="1545.6 1884.96"/>
+    <circle cx="512" cy="512" r="236" stroke="#8f560a" stroke-dasharray="1008.9 1482.83"/>
+    <circle cx="512" cy="512" r="172" stroke="#8b2e3e" stroke-dasharray="626.6 1080.71"/>
+    <circle cx="512" cy="512" r="108" stroke="#4a44a6" stroke-dasharray="237.5 678.58"/>
+  </g>
+  <circle cx="512" cy="512" r="30" fill="#1d1c1a"/>
+</svg>

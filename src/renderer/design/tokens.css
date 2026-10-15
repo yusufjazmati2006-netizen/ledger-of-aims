@@ -1,0 +1,276 @@
+@import 'tailwindcss';
+
+/*
+ * Ledger of Aims design tokens.
+ *
+ * Warm paper and ink neutrals with exactly one accent hue per goal. Every
+ * text/background pairing is verified against WCAG AA by `npm run contrast`
+ * (scripts/check-contrast.mjs), so edit values here and re-run it.
+ */
+
+:root {
+  color-scheme: light dark;
+
+  /* Neutrals — light */
+  --paper: #f6f3ed;
+  --surface: #fffdf8;
+  --surface-sunken: #efebe3;
+  --ink: #1d1c1a;
+  --ink-muted: #55514a;
+  --ink-faint: #6e695f;
+  --rule: #e3ddd2;
+  --rule-strong: #cbc3b5;
+  --control: #8e8679;
+  --focus: #2f5bd3;
+  --sidebar: #efebe3;
+  --scrim: rgb(29 28 26 / 0.28);
+
+  /* Goal accents — light */
+  --quran: #1d6a5a;
+  --quran-soft: #e2eeea;
+  --physique: #8f560a;
+  --physique-soft: #f4e9da;
+  --degree: #8b2e3e;
+  --degree-soft: #f3e3e5;
+  --game: #4a44a6;
+  --game-soft: #e8e6f5;
+
+  /* Status — light */
+  --positive: #2c6a39;
+  --positive-soft: #e3efe3;
+  --warning: #8a5300;
+  --warning-soft: #f7ebd6;
+  --critical: #a2312a;
+  --critical-soft: #f6e1de;
+
+  --accent: var(--ink);
+  --accent-soft: var(--surface-sunken);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #151513;
+    --surface: #1d1c19;
+    --surface-sunken: #11110f;
+    --ink: #ede8de;
+    --ink-muted: #b8b1a4;
+    --ink-faint: #958e81;
+    --rule: #2d2a25;
+    --rule-strong: #48433b;
+    --control: #7a7367;
+    --focus: #86a8ff;
+    --sidebar: #1a1917;
+    --scrim: rgb(0 0 0 / 0.5);
+
+    --quran: #6cc2ad;
+    --quran-soft: #1a2c27;
+    --physique: #e2ad5c;
+    --physique-soft: #2d2416;
+    --degree: #e98f9e;
+    --degree-soft: #2f1c20;
+    --game: #a6a0f4;
+    --game-soft: #222137;
+
+    --positive: #82c890;
+    --positive-soft: #1b2a1d;
+    --warning: #e9b14f;
+    --warning-soft: #2e2413;
+    --critical: #f28b80;
+    --critical-soft: #331b18;
+  }
+}
+
+/* On macOS the sidebar is translucent so the window's vibrancy shows through. */
+:root[data-platform='darwin'] {
+  --sidebar: transparent;
+}
+
+[data-goal='quran'] {
+  --accent: var(--quran);
+  --accent-soft: var(--quran-soft);
+}
+[data-goal='physique'] {
+  --accent: var(--physique);
+  --accent-soft: var(--physique-soft);
+}
+[data-goal='degree'] {
+  --accent: var(--degree);
+  --accent-soft: var(--degree-soft);
+}
+[data-goal='game'] {
+  --accent: var(--game);
+  --accent-soft: var(--game-soft);
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-sunken: var(--surface-sunken);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
+  --color-control: var(--control);
+  --color-focus: var(--focus);
+  --color-sidebar: var(--sidebar);
+  --color-scrim: var(--scrim);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-quran: var(--quran);
+  --color-quran-soft: var(--quran-soft);
+  --color-physique: var(--physique);
+  --color-physique-soft: var(--physique-soft);
+  --color-degree: var(--degree);
+  --color-degree-soft: var(--degree-soft);
+  --color-game: var(--game);
+  --color-game-soft: var(--game-soft);
+  --color-positive: var(--positive);
+  --color-positive-soft: var(--positive-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-critical: var(--critical);
+  --color-critical-soft: var(--critical-soft);
+}
+
+@theme {
+  --font-serif:
+    ui-serif, 'New York', 'Iowan Old Style', 'Charter', 'Source Serif Pro', Georgia, serif;
+  --font-sans:
+    system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', 'Segoe UI',
+    sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  html {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'kern', 'liga';
+  }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.5;
+    overflow: hidden;
+    user-select: none;
+    cursor: default;
+  }
+  :root[data-platform='darwin'] body {
+    background: transparent;
+  }
+  input,
+  textarea,
+  [contenteditable],
+  .selectable {
+    user-select: text;
+  }
+  h1,
+  h2,
+  h3 {
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--focus) 28%, transparent);
+  }
+  :focus {
+    outline: none;
+  }
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+  button {
+    cursor: default;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--ink) 18%, transparent);
+    border-radius: 10px;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@layer utilities {
+  .drag-region {
+    -webkit-app-region: drag;
+  }
+  .no-drag {
+    -webkit-app-region: no-drag;
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .hairline {
+    border-color: var(--rule);
+  }
+}
+
+@keyframes ledger-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes ledger-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-fade-in {
+  animation: ledger-fade-in 220ms var(--ease-out-soft) both;
+}
+.animate-scale-in {
+  animation: ledger-scale-in 200ms var(--ease-out-soft) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+:root[data-reduce-motion='true'] *,
+:root[data-reduce-motion='true'] *::before,
+:root[data-reduce-motion='true'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
