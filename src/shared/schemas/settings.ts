@@ -74,6 +74,28 @@ export const quranSettingsSchema = z.object({
 });
 export type QuranSettings = z.infer<typeof quranSettingsSchema>;
 
+export const physiqueSettingsSchema = z.object({
+  heightCm: z.number().int().min(100).max(250).nullable().default(null),
+  birthYear: z.number().int().min(1900).max(2020).nullable().default(null),
+  sex: z.enum(['male', 'female']).nullable().default(null),
+  /** Mifflin–St Jeor activity multiplier; 1.55 suits on-your-feet work plus training. */
+  activityFactor: z.number().min(1.1).max(2.4).default(1.55),
+  surplusKcal: z.number().int().min(-1000).max(1500).default(250),
+  proteinPerKg: z.number().min(0.8).max(3.5).default(2),
+  calorieOverride: z.number().int().min(800).max(8000).nullable().default(null),
+  proteinOverride: z.number().int().min(20).max(500).nullable().default(null),
+  trendAlpha: z.number().min(0.02).max(0.5).default(0.1),
+  fastMarginKg: z.number().min(0).max(1).default(0.15),
+  slowMarginKg: z.number().min(0).max(1).default(0.1),
+  maxWeeklyGainPct: z.number().min(0.1).max(2).default(0.5),
+  /** Rest days between full-body sessions (1 = every other day). */
+  restDays: z.number().int().min(0).max(3).default(1),
+  /** Daily adherence score (0–100) that counts towards the nutrition streak. */
+  adherenceThreshold: z.number().int().min(40).max(100).default(70),
+  streakGraceDays: z.number().int().min(0).max(6).default(1),
+});
+export type PhysiqueSettings = z.infer<typeof physiqueSettingsSchema>;
+
 export const windowSettingsSchema = z.object({
   bounds: z
     .object({
@@ -93,6 +115,7 @@ export const settingsSchemas = {
   onboarding: onboardingSettingsSchema,
   profile: profileSettingsSchema,
   quran: quranSettingsSchema,
+  physique: physiqueSettingsSchema,
   window: windowSettingsSchema,
 } as const;
 

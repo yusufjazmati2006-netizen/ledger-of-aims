@@ -7,6 +7,10 @@ import type { RepoContext } from './db/repositories/context';
 import { getAllSettings, getSettings, updateSettings } from './db/repositories/settings';
 import { coreHandlers } from './ipc/handlers/core';
 import { quranHandlers } from './ipc/handlers/quran';
+import { physiqueHandlers } from './ipc/handlers/physique';
+import { checkPhysiqueMilestones } from './services/milestoneEngine';
+import { handlePhotoProtocol, registerPhotoScheme } from './photo-protocol';
+import { resolvePhotoFile } from './services/photos';
 import { broadcast, setHandlers } from './ipc/register';
 import type { PartialHandlerTable } from './ipc/types';
 import { buildAppMenu } from './menu';
@@ -29,6 +33,8 @@ configureUserDataPath();
 app.commandLine.appendSwitch('disable-background-networking');
 app.commandLine.appendSwitch('disable-component-update');
 app.commandLine.appendSwitch('disable-domain-reliability');
+
+registerPhotoScheme();
 
 if (!app.requestSingleInstanceLock()) {
   app.quit();
@@ -136,6 +142,13 @@ function openData(): boolean {
     ...baseHandlers(),
     ...core,
     ...quranHandlers(context, broadcast),
+    ...physiqueHandlers(context, { photosDir: dataPaths().photos, window: () => mainWindow }),
+    'weighIns.upsert': (input) => {
+      const result = core['weighIns.upsert']?.(input);
+      for (const milestone of checkPhysiqueMilestones(context))
+        broadcast('milestone:completed', { milestone });
+      return result as ReturnType<NonNullable<(typeof core)['weighIns.upsert']>>;
+    },
     'settings.update': (input) => {
       const result = core['settings.update']?.(input);
       applyTheme(getSettings(context, 'general').theme);
@@ -174,6 +187,9 @@ function rebootIntoApp(): void {
 
 void app.whenReady().then(() => {
   guard = installNetworkGuard(session.defaultSession, process.env.ELECTRON_RENDERER_URL);
+  handlePhotoProtocol((id, variant) =>
+    ctx ? resolvePhotoFile(ctx, dataPaths().photos, id, variant) : null,
+  );
   const ok = openData();
   buildAppMenu({ dataPath: dataPaths().userData, devTools: !app.isPackaged });
   showWindow(ok ? '/' : '/recovery');

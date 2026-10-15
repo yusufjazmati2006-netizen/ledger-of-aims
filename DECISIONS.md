@@ -81,6 +81,30 @@ reasoning. Anything here can be revisited; most are editable defaults in the app
   automatically (an Undo of pages leaves the milestone as it is; untick it manually).
 - Scheduler changes apply to future reviews; existing due dates are not rewritten.
 
+## Physique module
+
+- **Trajectory** runs from the onboarding weight and date through the four checkpoints
+  (15 Oct each year), linearly. Real gains are not linear; the UI says so.
+- **Trend, not scale**: rates, verdicts, calorie formulas and checkpoint completion all
+  use the smoothed trend so a salty dinner never triggers anything.
+- **Rate band**: on pace means within −0.10 / +0.15 kg a week of the plan's rate, and
+  never above 0.5% of bodyweight a week (a common lean-gain ceiling). All editable.
+- **Calories**: Mifflin–St Jeor × activity (1.55 default for cafe shifts plus training)
+  when height, birth year and sex are given; otherwise 33 kcal per kg. +250 kcal
+  surplus and 2.0 g/kg protein by default; manual overrides allowed.
+- **Adherence score**: 50 points for calories (full within ±10%, zero beyond ±30%) and
+  50 for protein (full at ≥ 90% of target). A day counts for the streak at 70+; one
+  missed day in seven is forgiven. Past days are scored against current targets.
+- **Logged food copies** the favourite's values, so editing a favourite never rewrites
+  history. Starter favourites are labelled as approximations.
+- **One workout per date**; a set's load for bodyweight exercises is the _added_ load.
+- **Double progression** uses the heaviest load of the last session as its working
+  sets (lighter warm-ups are ignored). Two consecutive sessions below the rep floor at
+  the same load suggest a 10% deload rounded to the exercise's increment.
+- **Photos** are re-encoded to JPEG on import (which strips EXIF location data and
+  converts HEIC on macOS) and stored in `…/LedgerOfAims/photos/`. They are not stored
+  in the database.
+
 ## Privacy
 
 - No network access at runtime, enforced by four layers: a session-level request

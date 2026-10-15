@@ -132,3 +132,134 @@ function m(
 ): SeedMilestone {
   return { goalId, title, targetDate, targetValue, unit, kind, notes };
 }
+
+export interface SeedExercise {
+  name: string;
+  muscleGroup: string;
+  repMin: number;
+  repMax: number;
+  setsTarget: number;
+  incrementKg: number;
+  bodyweight: boolean;
+  inProgram: boolean;
+}
+
+/**
+ * A starter full-body library. The default programme (in_program) is a balanced
+ * every-other-day session: squat, press, row, hinge, vertical pull and push, plus two
+ * accessories. Edit freely; nothing here is prescriptive.
+ */
+export const SEED_EXERCISES: readonly SeedExercise[] = [
+  ex('Back squat', 'Legs', 6, 10, 3, 2.5, false, true),
+  ex('Bench press', 'Chest', 6, 10, 3, 2.5, false, true),
+  ex('Barbell row', 'Back', 8, 12, 3, 2.5, false, true),
+  ex('Romanian deadlift', 'Hamstrings', 8, 12, 3, 2.5, false, true),
+  ex('Overhead press', 'Shoulders', 6, 10, 3, 1.25, false, true),
+  ex('Pull-up', 'Back', 6, 12, 3, 1.25, true, true),
+  ex('Lateral raise', 'Shoulders', 12, 20, 3, 1, false, true),
+  ex('Dumbbell curl', 'Arms', 10, 15, 2, 1, false, true),
+  ex('Deadlift', 'Posterior chain', 3, 6, 3, 2.5, false, false),
+  ex('Front squat', 'Legs', 6, 10, 3, 2.5, false, false),
+  ex('Incline dumbbell press', 'Chest', 8, 12, 3, 2, false, false),
+  ex('Dips', 'Chest', 6, 12, 3, 1.25, true, false),
+  ex('Chin-up', 'Back', 6, 12, 3, 1.25, true, false),
+  ex('Lat pulldown', 'Back', 8, 12, 3, 2.5, false, false),
+  ex('Hip thrust', 'Glutes', 8, 12, 3, 5, false, false),
+  ex('Leg press', 'Legs', 10, 15, 3, 5, false, false),
+  ex('Triceps pushdown', 'Arms', 10, 15, 2, 2.5, false, false),
+  ex('Face pull', 'Shoulders', 12, 20, 2, 2.5, false, false),
+  ex('Calf raise', 'Calves', 10, 20, 3, 5, false, false),
+  ex('Hanging leg raise', 'Core', 8, 15, 3, 0, true, false),
+];
+
+function ex(
+  name: string,
+  muscleGroup: string,
+  repMin: number,
+  repMax: number,
+  setsTarget: number,
+  incrementKg: number,
+  bodyweight: boolean,
+  inProgram: boolean,
+): SeedExercise {
+  return { name, muscleGroup, repMin, repMax, setsTarget, incrementKg, bodyweight, inProgram };
+}
+
+export interface SeedFood {
+  name: string;
+  calories: number;
+  protein: number;
+  serving: string;
+  ingredients: string;
+}
+
+/**
+ * Starter favourites so quick-add works on day one. Values are typical approximations
+ * — replace them with the figures on your own labels.
+ */
+export const SEED_FOODS: readonly SeedFood[] = [
+  {
+    name: 'Chicken, rice & veg',
+    calories: 650,
+    protein: 55,
+    serving: '1 box',
+    ingredients: '200 g chicken breast\n125 g rice\n150 g frozen vegetables\n1 tbsp olive oil',
+  },
+  {
+    name: 'Oats with milk',
+    calories: 380,
+    protein: 21,
+    serving: '1 bowl',
+    ingredients: '60 g oats\n300 ml semi-skimmed milk',
+  },
+  {
+    name: 'Whey shake',
+    calories: 120,
+    protein: 24,
+    serving: '1 scoop',
+    ingredients: '1 scoop whey protein',
+  },
+  {
+    name: 'Greek yoghurt 0%',
+    calories: 120,
+    protein: 20,
+    serving: '200 g',
+    ingredients: '200 g greek yoghurt',
+  },
+  {
+    name: 'Three eggs on toast',
+    calories: 420,
+    protein: 26,
+    serving: '1 plate',
+    ingredients: '3 eggs\n2 slices wholemeal bread',
+  },
+  {
+    name: 'Beef mince & pasta',
+    calories: 720,
+    protein: 52,
+    serving: '1 box',
+    ingredients: '200 g beef mince 5%\n100 g pasta\n150 g tomato passata',
+  },
+  {
+    name: 'Tuna wrap',
+    calories: 430,
+    protein: 35,
+    serving: '1 wrap',
+    ingredients: '1 can tuna\n1 tortilla wrap\n1 tbsp light mayonnaise',
+  },
+  { name: 'Banana', calories: 105, protein: 1, serving: '1 medium', ingredients: '1 banana' },
+  {
+    name: 'Peanut butter toast',
+    calories: 400,
+    protein: 15,
+    serving: '2 slices',
+    ingredients: '2 slices wholemeal bread\n30 g peanut butter',
+  },
+  {
+    name: 'Milk (glass)',
+    calories: 125,
+    protein: 9,
+    serving: '250 ml',
+    ingredients: '250 ml semi-skimmed milk',
+  },
+];

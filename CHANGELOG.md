@@ -2,6 +2,47 @@
 
 All notable changes, by phase.
 
+## [0.3.0] — Phase 3: Physique
+
+### Added
+
+- **Weight trend**: exponentially smoothed trend (α = 0.1, tunable) with gaps filled
+  by interpolation; weekly rate from a 14-day least-squares slope; plotted with raw
+  weigh-ins and the plan line (30 days / 90 days / year / whole plan).
+- **Rate verdict**: too fast / on pace / too slow against the plan's required rate,
+  capped at 0.5% of bodyweight a week, with a plain-language suggestion; shown only
+  once there are five weigh-ins over ten days.
+- **Weigh-in logging** in one field (kg or lb), back-dating, Undo that restores the
+  previous value.
+- **Checkpoints** complete automatically when the _trend_ (not a single weigh-in)
+  reaches them, with the shared celebration.
+- **Training**: every-other-day status (rest-day aware; a missed session shifts the
+  cycle rather than doubling up), a two-week calendar strip, a per-exercise set
+  logger with double-progression suggestions (add reps → add load → deload after two
+  stalled sessions), PR detection (Epley e1RM) on every set, records table, recent
+  sessions, and an exercise library with programme membership and archiving.
+- **Nutrition**: calorie and protein targets from Mifflin–St Jeor (or 33 kcal/kg)
+  plus a chosen surplus, with the working shown; one-tap favourites; custom entries;
+  daily adherence score; forgiving nutrition streak; 14-day adherence chart.
+- **Meal prep**: weekly plan from favourites with per-day totals against target, copy a
+  day across the week, log a planned day as eaten, an aggregated shopping list
+  (units normalised), and prep sessions.
+- **Progress photos**: imported into the private data folder (HEIC converted on
+  macOS), thumbnails, a gallery and side-by-side comparison with trend weights;
+  served through a local `ledger-photo://` protocol.
+- Settings → Physique for height, birth year, sex, activity, surplus, protein,
+  overrides, smoothing, rate thresholds, rest days and streak rules.
+- Today's Physique card: trend weight, rate verdict, training status and intake.
+- Seeded exercise library (20 exercises, an 8-exercise default programme) and ten
+  starter favourites marked as approximate.
+- Migration `003_physique`.
+
+### Tests
+
+- 173 unit tests (47 new: trend, rate, nutrition, adherence, progression, PRs,
+  schedule, meal plan, repositories, milestone auto-completion) and 8 end-to-end
+  flows (new: weigh-in/undo, PR set logging, nutrition, meal prep, photo import).
+
 ## [0.2.0] — Phase 2: Shared domain and the Quran module
 
 ### Added

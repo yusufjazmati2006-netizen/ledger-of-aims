@@ -25,6 +25,8 @@ export interface TimeSeries {
   dashed?: boolean;
   /** Reference series (targets) draw thinner. */
   reference?: boolean;
+  /** Draw unconnected dots (e.g. raw weigh-ins) instead of a line. */
+  dots?: boolean;
   points: { date: string; value: number }[];
 }
 
@@ -79,7 +81,7 @@ export function TimeChart({
       legend={series.map((s) => ({
         label: s.label,
         color: s.color,
-        kind: s.dashed ? 'dashed' : 'line',
+        kind: s.dots ? 'dot' : s.dashed ? 'dashed' : 'line',
       }))}
       table={{
         columns: ['Date', ...series.map((s) => `${s.label} (${unit})`)],
@@ -148,23 +150,37 @@ export function TimeChart({
               ) : null;
             }}
           />
-          {series.map((s) => (
-            <Line
-              key={s.key}
-              dataKey={s.key}
-              type="linear"
-              stroke={s.color}
-              strokeWidth={s.reference ? 1.5 : 2}
-              strokeDasharray={s.dashed ? '5 4' : undefined}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              dot={false}
-              activeDot={{ r: 4, stroke: c.surface, strokeWidth: 2, fill: s.color }}
-              connectNulls
-              isAnimationActive={!reduced}
-              animationDuration={500}
-            />
-          ))}
+          {series.map((s) =>
+            s.dots ? (
+              <Line
+                key={s.key}
+                dataKey={s.key}
+                type="linear"
+                stroke="transparent"
+                strokeWidth={0}
+                dot={{ r: 2.5, fill: s.color, stroke: 'none', fillOpacity: 0.55 }}
+                activeDot={{ r: 4, stroke: c.surface, strokeWidth: 2, fill: s.color }}
+                connectNulls={false}
+                isAnimationActive={false}
+              />
+            ) : (
+              <Line
+                key={s.key}
+                dataKey={s.key}
+                type="linear"
+                stroke={s.color}
+                strokeWidth={s.reference ? 1.5 : 2}
+                strokeDasharray={s.dashed ? '5 4' : undefined}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                dot={false}
+                activeDot={{ r: 4, stroke: c.surface, strokeWidth: 2, fill: s.color }}
+                connectNulls
+                isAnimationActive={!reduced}
+                animationDuration={500}
+              />
+            ),
+          )}
         </LineChart>
       </ResponsiveContainer>
     </ChartFrame>

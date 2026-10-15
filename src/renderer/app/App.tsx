@@ -17,6 +17,12 @@ import { QuranOverview } from '../features/quran/QuranOverview';
 import { RevisionPage } from '../features/quran/RevisionPage';
 import { MushafPage } from '../features/quran/MushafPage';
 import { LearningLogPage } from '../features/quran/LearningLogPage';
+import { PhysiquePage } from '../features/physique/PhysiquePage';
+import { WeightPage } from '../features/physique/WeightPage';
+import { TrainingPage } from '../features/physique/TrainingPage';
+import { NutritionPage } from '../features/physique/NutritionPage';
+import { MealPrepPage } from '../features/physique/MealPrepPage';
+import { PhotosPage } from '../features/physique/PhotosPage';
 
 const router = createHashRouter([
   {
@@ -32,6 +38,17 @@ const router = createHashRouter([
           { path: 'revision', element: <RevisionPage /> },
           { path: 'mushaf', element: <MushafPage /> },
           { path: 'log', element: <LearningLogPage /> },
+        ],
+      },
+      {
+        path: 'physique',
+        element: <PhysiquePage />,
+        children: [
+          { index: true, element: <WeightPage /> },
+          { path: 'training', element: <TrainingPage /> },
+          { path: 'nutrition', element: <NutritionPage /> },
+          { path: 'meal-prep', element: <MealPrepPage /> },
+          { path: 'photos', element: <PhotosPage /> },
         ],
       },
       { path: 'milestones', element: <MilestonesPage /> },

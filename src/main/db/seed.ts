@@ -1,4 +1,10 @@
-import { SEED_GOALS, SEED_MILESTONES, SEED_SHIFT_TYPES } from '@shared/seed/defaults';
+import {
+  SEED_EXERCISES,
+  SEED_FOODS,
+  SEED_GOALS,
+  SEED_MILESTONES,
+  SEED_SHIFT_TYPES,
+} from '@shared/seed/defaults';
 import { newId, type RepoContext } from './repositories/context';
 
 /**
@@ -57,6 +63,41 @@ export function seedDatabase(ctx: RepoContext): { seeded: string[] } {
       );
       for (const s of SEED_SHIFT_TYPES) insert.run(s.id, s.label, s.start, s.end, s.sortOrder);
       seeded.push('shift_types');
+    }
+
+    if (isEmpty('exercises')) {
+      const insert = db.prepare(
+        `INSERT INTO exercises (id, name, muscle_group, rep_min, rep_max, sets_target, increment_kg, bodyweight, in_program, sort_order, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      );
+      SEED_EXERCISES.forEach((e, i) => {
+        insert.run(
+          newId(),
+          e.name,
+          e.muscleGroup,
+          e.repMin,
+          e.repMax,
+          e.setsTarget,
+          e.incrementKg,
+          e.bodyweight ? 1 : 0,
+          e.inProgram ? 1 : 0,
+          i,
+          now,
+          now,
+        );
+      });
+      seeded.push('exercises');
+    }
+
+    if (isEmpty('foods')) {
+      const insert = db.prepare(
+        `INSERT INTO foods (id, name, calories, protein_g, serving, ingredients, favourite, sort_order, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?, ?)`,
+      );
+      SEED_FOODS.forEach((f, i) => {
+        insert.run(newId(), f.name, f.calories, f.protein, f.serving, f.ingredients, i, now, now);
+      });
+      seeded.push('foods');
     }
   })();
 

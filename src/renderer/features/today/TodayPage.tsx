@@ -1,16 +1,27 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
-import { diffDays, formatDate, parts, monthLong, weekdayLong } from '@shared/domain/time/localDate';
+import {
+  addDays,
+  diffDays,
+  formatDate,
+  parts,
+  monthLong,
+  weekdayLong,
+  weekdayShort,
+} from '@shared/domain/time/localDate';
 import { countdown, nextMilestone } from '@shared/domain/milestones/milestones';
-import { targetWeightAt, type TrajectoryPoint } from '@shared/domain/physique/trajectory';
+import { trainingStatus } from '@shared/domain/physique/schedule';
+import { sumIntake } from '@shared/domain/physique/nutrition';
+import type { RateStatus } from '@shared/domain/physique/trend';
 import { GOAL_IDS, type GoalId } from '@shared/schemas/common';
-import type { Goal, Milestone, ShiftType, WeighIn } from '@shared/schemas/core';
+import type { Goal, Milestone, ShiftType } from '@shared/schemas/core';
 import { useSettings, useToday } from '../../stores/app';
 import { useLedger } from '../../lib/useLedger';
 import { api } from '../../lib/api';
 import { formatWeight } from '../../lib/units';
 import { GOAL_META } from '../../lib/goals';
-import { Card, PageHeader, Pill } from '../../design/Card';
+import { Card, PageHeader, Pill, type PillTone } from '../../design/Card';
+import { usePhysique } from '../physique/usePhysique';
 import { Ring } from '../../design/Ring';
 import { useQuran } from '../quran/useQuran';
 import { VERDICT_TONE, verdictHeadline } from '../quran/verdict';
@@ -25,7 +36,6 @@ export function TodayPage() {
   const milestones = useLedger('milestones.list', undefined, { domains: ['milestones'] });
   const shiftTypes = useLedger('shifts.types', undefined, { domains: ['shifts'] });
   const shiftDays = useLedger('shifts.range', { from: today, to: today }, { domains: ['shifts'] });
-  const weighIns = useLedger('weighIns.list', {}, { domains: ['weighIns'] });
 
   const shiftId = shiftDays.data?.[0]?.shiftTypeId ?? null;
   const shift = shiftTypes.data?.find((t) => t.id === shiftId);
@@ -69,13 +79,7 @@ export function TodayPage() {
             const goal = goals.data?.find((g) => g.id === id);
             if (!goal) return <div key={id} className="h-[208px] rounded-xl bg-sunken/50" />;
             return (
-              <GoalCard
-                key={id}
-                goal={goal}
-                today={today}
-                milestones={milestones.data ?? []}
-                weighIns={weighIns.data ?? []}
-              />
+              <GoalCard key={id} goal={goal} today={today} milestones={milestones.data ?? []} />
             );
           })}
         </div>
@@ -94,12 +98,10 @@ function GoalCard({
   goal,
   today,
   milestones,
-  weighIns,
 }: {
   goal: Goal;
   today: string;
   milestones: Milestone[];
-  weighIns: WeighIn[];
 }) {
   const next = nextMilestone(milestones, goal.id);
   const due = next ? countdown(today, next.targetDate) : null;
@@ -127,7 +129,7 @@ function GoalCard({
         </div>
       </div>
 
-      <GoalProgress goalId={goal.id} today={today} milestones={milestones} weighIns={weighIns} />
+      <GoalProgress goalId={goal.id} />
 
       {next && due ? (
         <div className="mt-4 flex items-baseline justify-between gap-3 border-t border-rule pt-3">
@@ -166,61 +168,89 @@ function GoalCard({
  * Goal-specific progress. Each module contributes its own measure as it is built;
  * until then the card is honest that there is nothing to measure yet.
  */
-function GoalProgress({
-  goalId,
-  today,
-  milestones,
-  weighIns,
-}: {
-  goalId: GoalId;
-  today: string;
-  milestones: Milestone[];
-  weighIns: WeighIn[];
-}) {
-  const settings = useSettings();
+function GoalProgress({ goalId }: { goalId: GoalId }) {
   if (goalId === 'quran') return <QuranProgress />;
-  if (goalId === 'physique') {
-    const latest = weighIns[weighIns.length - 1];
-    const { startWeightKg, startDate } = settings.profile;
-    if (!latest || startWeightKg === null || startDate === null) {
-      return <p className="mt-4 text-[13px] text-ink-muted">Log a weigh-in to start the trend.</p>;
-    }
-    const points: TrajectoryPoint[] = [
-      { date: startDate, kg: startWeightKg },
-      ...milestones
-        .filter((m) => m.goalId === 'physique' && m.targetValue !== null)
-        .sort((a, b) => a.targetDate.localeCompare(b.targetDate))
-        .map((m) => ({ date: m.targetDate, kg: m.targetValue ?? 0 })),
-    ];
-    const target = targetWeightAt(points, today);
-    const finalKg = points[points.length - 1]?.kg ?? startWeightKg;
-    const progress =
-      finalKg === startWeightKg ? 0 : (latest.weightKg - startWeightKg) / (finalKg - startWeightKg);
-    return (
-      <div className="mt-4 flex items-end justify-between gap-4">
-        <div>
-          <div className="text-[28px] leading-none font-semibold tracking-[-0.01em] text-ink">
-            {formatWeight(latest.weightKg, settings.general.units)}
-          </div>
-          <div className="mt-1 text-[12.5px] text-ink-muted">
-            {latest.date === today
-              ? 'weighed today'
-              : `last weighed ${formatDate(latest.date, { year: false })}`}
-            {target !== null
-              ? ` · target today ${formatWeight(target, settings.general.units)}`
-              : ''}
-          </div>
-        </div>
-        <Pill tone="accent">
-          {Math.round(Math.max(0, Math.min(1, progress)) * 100)}% of the way
-        </Pill>
-      </div>
-    );
-  }
+  if (goalId === 'physique') return <PhysiqueProgress />;
   return (
     <p className="mt-4 text-[13px] text-ink-muted">
       Progress tracking for this goal arrives with its module.
     </p>
+  );
+}
+
+const RATE_PILL: Record<RateStatus, { tone: PillTone; label: string }> = {
+  'on-pace': { tone: 'positive', label: 'Gaining on pace' },
+  'too-fast': { tone: 'warning', label: 'Gaining too fast' },
+  'too-slow': { tone: 'warning', label: 'Gaining too slowly' },
+  'insufficient-data': { tone: 'neutral', label: 'Building the trend' },
+};
+
+function PhysiqueProgress() {
+  const settings = useSettings();
+  const today = useToday();
+  const view = usePhysique();
+  const workouts = useLedger(
+    'workouts.list',
+    { from: addDays(today, -21), to: today },
+    { domains: ['training'] },
+  );
+  const eaten = useLedger(
+    'foodEntries.list',
+    { from: today, to: today },
+    { domains: ['nutrition'] },
+  );
+  const unit = settings.general.units;
+  if (!view.ready) return <div className="mt-4 h-[52px]" />;
+  if (!view.latest) {
+    return (
+      <p className="mt-4 text-[13px] text-ink-muted">
+        <Link to="/physique" className="font-medium text-ink underline underline-offset-2">
+          Log a weigh-in
+        </Link>{' '}
+        to start the trend.
+      </p>
+    );
+  }
+  const lastWeighIn = view.weighIns[view.weighIns.length - 1];
+  const lastSession =
+    [...(workouts.data ?? [])].reverse().find((w) => w.sets.length > 0)?.date ?? null;
+  const status = trainingStatus(lastSession, today, settings.physique.restDays);
+  const intake = sumIntake(eaten.data ?? []);
+  const pill = RATE_PILL[view.verdict.status];
+  return (
+    <div className="mt-4">
+      <div className="flex items-end justify-between gap-4">
+        <div>
+          <div className="text-[28px] leading-none font-semibold tracking-[-0.01em] text-ink">
+            {formatWeight(view.latest.trend, unit)}
+          </div>
+          <div className="mt-1 text-[12.5px] text-ink-muted">
+            trend ·{' '}
+            {lastWeighIn?.date === today
+              ? 'weighed today'
+              : `last weighed ${lastWeighIn ? formatDate(lastWeighIn.date, { year: false }) : '—'}`}
+            {view.targetToday !== null ? ` · plan ${formatWeight(view.targetToday, unit)}` : ''}
+          </div>
+        </div>
+        <Pill tone={pill.tone}>{pill.label}</Pill>
+      </div>
+      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[12.5px] text-ink-muted">
+        <Link to="/physique/training" className="underline-offset-2 hover:underline">
+          {status.kind === 'due' || status.kind === 'overdue'
+            ? 'Training day'
+            : status.kind === 'trained-today'
+              ? 'Trained today'
+              : `Rest day · next ${weekdayShort(status.next)}`}
+        </Link>
+        {view.nutrition ? (
+          <Link to="/physique/nutrition" className="tabular underline-offset-2 hover:underline">
+            {Math.round(intake.calories).toLocaleString('en-GB')} /{' '}
+            {view.nutrition.calories.toLocaleString('en-GB')} kcal · {Math.round(intake.protein)} /{' '}
+            {view.nutrition.protein} g protein
+          </Link>
+        ) : null}
+      </div>
+    </div>
   );
 }
 

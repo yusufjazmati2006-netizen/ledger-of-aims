@@ -29,6 +29,23 @@ import {
   type QuranPagesPayload,
   type ReviewEntry,
 } from '../schemas/quran';
+import {
+  exerciseInputSchema,
+  foodInputSchema,
+  logFoodSchema,
+  logSetSchema,
+  mealSlotSchema,
+  photoMetaSchema,
+  type Exercise,
+  type Food,
+  type FoodEntry,
+  type LoggedSetResult,
+  type MealPlanEntry,
+  type Photo,
+  type PrepSession,
+  type Workout,
+  type WorkoutSet,
+} from '../schemas/physique';
 import { settingsSchemas, type SettingsMap } from '../schemas/settings';
 
 /**
@@ -45,7 +62,16 @@ import { settingsSchemas, type SettingsMap } from '../schemas/settings';
 const out = <T>() => undefined as unknown as T;
 
 export type DataDomain =
-  'settings' | 'goals' | 'milestones' | 'shifts' | 'weighIns' | 'onboarding' | 'quran';
+  | 'settings'
+  | 'goals'
+  | 'milestones'
+  | 'shifts'
+  | 'weighIns'
+  | 'onboarding'
+  | 'quran'
+  | 'training'
+  | 'nutrition'
+  | 'photos';
 
 interface ChannelSpec {
   input: z.ZodType;
@@ -91,6 +117,7 @@ const settingsUpdateSchema = z.discriminatedUnion('namespace', [
   z.object({ namespace: z.literal('onboarding'), patch: patchSchema(settingsSchemas.onboarding) }),
   z.object({ namespace: z.literal('profile'), patch: patchSchema(settingsSchemas.profile) }),
   z.object({ namespace: z.literal('quran'), patch: patchSchema(settingsSchemas.quran) }),
+  z.object({ namespace: z.literal('physique'), patch: patchSchema(settingsSchemas.physique) }),
   z.object({ namespace: z.literal('window'), patch: patchSchema(settingsSchemas.window) }),
 ]);
 
@@ -154,7 +181,11 @@ export const contract = {
 
   // Weigh-ins (the core of onboarding; the full physique module builds on these)
   'weighIns.list': { input: dateRangeSchema, output: out<WeighIn[]>() },
-  'weighIns.upsert': { input: weighInInputSchema, output: out<WeighIn>(), mutates: ['weighIns'] },
+  'weighIns.upsert': {
+    input: weighInInputSchema,
+    output: out<WeighIn>(),
+    mutates: ['weighIns', 'milestones'],
+  },
   'weighIns.delete': {
     input: z.object({ id: idSchema }),
     output: out<null>(),
@@ -204,6 +235,124 @@ export const contract = {
     output: out<null>(),
     mutates: ['quran'],
   },
+
+  // Physique — training
+  'exercises.list': { input: z.void(), output: out<Exercise[]>() },
+  'exercises.create': {
+    input: exerciseInputSchema,
+    output: out<Exercise>(),
+    mutates: ['training'],
+  },
+  'exercises.update': {
+    input: z.object({
+      id: idSchema,
+      patch: patchSchema(exerciseInputSchema).extend({ archived: z.boolean().optional() }),
+    }),
+    output: out<Exercise>(),
+    mutates: ['training'],
+  },
+  'exercises.reorder': {
+    input: z.object({ orderedIds: z.array(idSchema).min(1) }),
+    output: out<Exercise[]>(),
+    mutates: ['training'],
+  },
+  'workouts.list': { input: dateRangeSchema, output: out<Workout[]>() },
+  'workouts.logSet': { input: logSetSchema, output: out<LoggedSetResult>(), mutates: ['training'] },
+  'workouts.updateSet': {
+    input: z.object({
+      id: idSchema,
+      reps: z.number().int().min(0).max(100).optional(),
+      loadKg: z.number().min(0).max(1000).optional(),
+    }),
+    output: out<WorkoutSet>(),
+    mutates: ['training'],
+  },
+  'workouts.deleteSet': {
+    input: z.object({ id: idSchema }),
+    output: out<null>(),
+    mutates: ['training'],
+  },
+  'workouts.setNotes': {
+    input: z.object({ id: idSchema, notes: z.string().max(2000) }),
+    output: out<null>(),
+    mutates: ['training'],
+  },
+
+  // Physique — nutrition
+  'foods.list': { input: z.void(), output: out<Food[]>() },
+  'foods.create': { input: foodInputSchema, output: out<Food>(), mutates: ['nutrition'] },
+  'foods.update': {
+    input: z.object({
+      id: idSchema,
+      patch: patchSchema(foodInputSchema).extend({ archived: z.boolean().optional() }),
+    }),
+    output: out<Food>(),
+    mutates: ['nutrition'],
+  },
+  'foodEntries.list': {
+    input: z.object({ from: localDateSchema, to: localDateSchema }),
+    output: out<FoodEntry[]>(),
+  },
+  'foodEntries.log': { input: logFoodSchema, output: out<FoodEntry>(), mutates: ['nutrition'] },
+  'foodEntries.delete': {
+    input: z.object({ id: idSchema }),
+    output: out<null>(),
+    mutates: ['nutrition'],
+  },
+  'mealPlan.list': {
+    input: z.object({ from: localDateSchema, to: localDateSchema }),
+    output: out<MealPlanEntry[]>(),
+  },
+  'mealPlan.add': {
+    input: z.object({
+      date: localDateSchema,
+      slot: mealSlotSchema,
+      foodId: idSchema,
+      servings: z.number().min(0.25).max(20),
+    }),
+    output: out<MealPlanEntry>(),
+    mutates: ['nutrition'],
+  },
+  'mealPlan.remove': {
+    input: z.object({ id: idSchema }),
+    output: out<null>(),
+    mutates: ['nutrition'],
+  },
+  'mealPlan.copyDay': {
+    input: z.object({ from: localDateSchema, to: z.array(localDateSchema).min(1).max(31) }),
+    output: out<MealPlanEntry[]>(),
+    mutates: ['nutrition'],
+  },
+  'mealPlan.logDay': {
+    input: z.object({ date: localDateSchema }),
+    output: out<FoodEntry[]>(),
+    mutates: ['nutrition'],
+  },
+  'prep.list': {
+    input: z.object({ from: localDateSchema, to: localDateSchema }),
+    output: out<PrepSession[]>(),
+  },
+  'prep.save': {
+    input: z.object({
+      id: idSchema.optional(),
+      date: localDateSchema,
+      notes: z.string().max(2000),
+      done: z.boolean(),
+    }),
+    output: out<PrepSession>(),
+    mutates: ['nutrition'],
+  },
+  'prep.delete': { input: z.object({ id: idSchema }), output: out<null>(), mutates: ['nutrition'] },
+
+  // Physique — photos (files stay in the private data folder)
+  'photos.list': { input: z.void(), output: out<Photo[]>() },
+  'photos.import': { input: photoMetaSchema, output: out<Photo[]>(), mutates: ['photos'] },
+  'photos.update': {
+    input: z.object({ id: idSchema, patch: patchSchema(photoMetaSchema) }),
+    output: out<Photo>(),
+    mutates: ['photos'],
+  },
+  'photos.delete': { input: z.object({ id: idSchema }), output: out<null>(), mutates: ['photos'] },
 
   // Recovery (available when the database could not be opened)
   'recovery.restore': { input: z.object({ path: z.string().min(1) }), output: out<null>() },

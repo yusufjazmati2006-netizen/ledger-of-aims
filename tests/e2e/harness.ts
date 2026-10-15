@@ -68,7 +68,7 @@ export async function completeOnboarding(
   await page.getByRole('heading', { name: 'This week’s shifts' }).waitFor();
   await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByRole('button', { name: 'Open today' }).click();
-  await page.getByRole('heading', { name: '15 October' }).waitFor();
+  await page.getByRole('navigation', { name: 'Sections' }).waitFor();
 }
 
 export async function networkLog(page: Page): Promise<unknown[]> {

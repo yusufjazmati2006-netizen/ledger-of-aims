@@ -4,7 +4,7 @@ import { Button } from '../Button';
 export interface LegendItem {
   label: string;
   color: string;
-  kind: 'line' | 'dashed' | 'bar';
+  kind: 'line' | 'dashed' | 'bar' | 'dot';
 }
 
 /**
@@ -102,6 +102,14 @@ export function ChartFrame({
 }
 
 function LegendKey({ item }: { item: LegendItem }) {
+  if (item.kind === 'dot') {
+    return (
+      <span
+        className="inline-block h-2 w-2 rounded-full opacity-60"
+        style={{ background: item.color }}
+      />
+    );
+  }
   if (item.kind === 'bar') {
     return (
       <span className="inline-block h-2.5 w-2.5 rounded-[2px]" style={{ background: item.color }} />

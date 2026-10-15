@@ -11,6 +11,7 @@ import { Field, SegmentedControl, Select, Switch, TextInput } from '../../design
 import { Button } from '../../design/Button';
 import { Icon } from '../../design/icons';
 import { QuranSettingsSection } from './QuranSettings';
+import { PhysiqueSettingsSection } from './PhysiqueSettings';
 
 function SettingsSection({
   id,
@@ -119,6 +120,14 @@ export function SettingsPage() {
           description="Revision time, pace and the spaced-repetition scheduler. Every formula is shown with its parameters."
         >
           <QuranSettingsSection />
+        </SettingsSection>
+
+        <SettingsSection
+          id="physique"
+          title="Physique"
+          description="Calorie and protein targets, trend smoothing, rate warnings and training rhythm."
+        >
+          <PhysiqueSettingsSection />
         </SettingsSection>
 
         <SettingsSection

@@ -48,7 +48,7 @@ describe('IPC dispatch', () => {
       ok: true,
       data: { id: 'w1', date: '2026-10-15', weightKg: 66.4, note: '' },
     });
-    expect(onMutated).toHaveBeenCalledWith(['weighIns']);
+    expect(onMutated).toHaveBeenCalledWith(['weighIns', 'milestones']);
   });
 
   it('does not report reads as mutations', async () => {
