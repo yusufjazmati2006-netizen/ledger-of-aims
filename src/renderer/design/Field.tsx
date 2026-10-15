@@ -9,7 +9,10 @@ import {
 import { cx } from '../lib/cx';
 
 const controlBase =
-  'w-full rounded-lg border border-control bg-surface px-3 text-[13.5px] text-ink placeholder:text-ink-faint transition-[border-color,box-shadow] duration-150 focus-visible:border-focus focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus/25 disabled:opacity-50 aria-[invalid=true]:border-critical';
+  'rounded-lg border border-control bg-surface px-3 text-[13.5px] text-ink placeholder:text-ink-faint transition-[border-color,box-shadow] duration-150 focus-visible:border-focus focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus/25 disabled:opacity-50 aria-[invalid=true]:border-critical';
+
+/** Controls fill their container unless the caller sets an explicit width. */
+const width = (className?: string) => (className && /(^|\s)w-/.test(className) ? '' : 'w-full');
 
 // A neutral grey chevron that reads on both light and dark surfaces.
 const CHEVRON = `url("data:image/svg+xml,${encodeURIComponent(
@@ -50,7 +53,9 @@ export function Field({
 
 export const TextInput = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(
   function TextInput({ className, ...rest }, ref) {
-    return <input ref={ref} className={cx(controlBase, 'h-9', className)} {...rest} />;
+    return (
+      <input ref={ref} className={cx(controlBase, width(className), 'h-9', className)} {...rest} />
+    );
   },
 );
 
@@ -61,7 +66,12 @@ export const TextArea = forwardRef<
   return (
     <textarea
       ref={ref}
-      className={cx(controlBase, 'min-h-[84px] resize-y py-2 leading-relaxed', className)}
+      className={cx(
+        controlBase,
+        width(className),
+        'min-h-[84px] resize-y py-2 leading-relaxed',
+        className,
+      )}
       {...rest}
     />
   );
@@ -74,6 +84,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTMLSel
         ref={ref}
         className={cx(
           controlBase,
+          width(className),
           'h-9 appearance-none bg-[length:16px] bg-[right_10px_center] bg-no-repeat pr-9',
           className,
         )}

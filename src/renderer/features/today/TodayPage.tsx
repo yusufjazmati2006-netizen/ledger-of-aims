@@ -11,6 +11,9 @@ import { api } from '../../lib/api';
 import { formatWeight } from '../../lib/units';
 import { GOAL_META } from '../../lib/goals';
 import { Card, PageHeader, Pill } from '../../design/Card';
+import { Ring } from '../../design/Ring';
+import { useQuran } from '../quran/useQuran';
+import { VERDICT_TONE, verdictHeadline } from '../quran/verdict';
 import { SegmentedControl } from '../../design/Field';
 import { Icon } from '../../design/icons';
 import { toast } from '../../stores/toasts';
@@ -175,6 +178,7 @@ function GoalProgress({
   weighIns: WeighIn[];
 }) {
   const settings = useSettings();
+  if (goalId === 'quran') return <QuranProgress />;
   if (goalId === 'physique') {
     const latest = weighIns[weighIns.length - 1];
     const { startWeightKg, startDate } = settings.profile;
@@ -195,7 +199,7 @@ function GoalProgress({
     return (
       <div className="mt-4 flex items-end justify-between gap-4">
         <div>
-          <div className="tabular font-serif text-[28px] leading-none font-semibold text-ink">
+          <div className="text-[28px] leading-none font-semibold tracking-[-0.01em] text-ink">
             {formatWeight(latest.weightKg, settings.general.units)}
           </div>
           <div className="mt-1 text-[12.5px] text-ink-muted">
@@ -217,6 +221,49 @@ function GoalProgress({
     <p className="mt-4 text-[13px] text-ink-muted">
       Progress tracking for this goal arrives with its module.
     </p>
+  );
+}
+
+function QuranProgress() {
+  const quran = useQuran();
+  if (!quran.ready) return <div className="mt-4 h-[52px]" />;
+  if (!quran.setUp || !quran.pace || !quran.queue) {
+    return (
+      <p className="mt-4 text-[13px] text-ink-muted">
+        <Link to="/quran" className="font-medium text-ink underline underline-offset-2">
+          Set up your mushaf
+        </Link>{' '}
+        to track pages, pace and revision.
+      </p>
+    );
+  }
+  const { pace, queue } = quran;
+  return (
+    <div className="mt-4 flex items-center gap-4">
+      <Ring
+        value={pace.learned / 604}
+        size={52}
+        stroke={5}
+        label={`${Math.round((pace.learned / 604) * 100)}% of the mushaf learned`}
+      >
+        <span className="tabular text-[11.5px] font-semibold text-ink">
+          {Math.round((pace.learned / 604) * 100)}%
+        </span>
+      </Ring>
+      <div className="min-w-0 flex-1">
+        <div className="text-[13.5px] text-ink">
+          <span className="font-semibold">{pace.learned}</span> of 604 pages ·{' '}
+          <Link to="/quran/revision" className="underline-offset-2 hover:underline">
+            {queue.dueCount === 0
+              ? 'revision up to date'
+              : `${queue.dueCount} page${queue.dueCount === 1 ? '' : 's'} to revise`}
+          </Link>
+        </div>
+        <div className="mt-1">
+          <Pill tone={VERDICT_TONE[pace.verdict]}>{verdictHeadline(pace)}</Pill>
+        </div>
+      </div>
+    </div>
   );
 }
 

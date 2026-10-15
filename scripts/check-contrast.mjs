@@ -70,6 +70,7 @@ const uiPairs = [
   ['focus', 'paper', 3],
   ['focus', 'surface', 3],
   ['quran', 'paper', 3],
+  ['chart-reference', 'surface', 3],
 ];
 
 let failures = 0;

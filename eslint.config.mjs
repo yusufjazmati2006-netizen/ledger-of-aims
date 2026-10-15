@@ -67,6 +67,8 @@ export default tseslint.config(
         'error',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
+      // Allows idiomatic React handlers such as `onClick={() => setOpen(true)}`.
+      '@typescript-eslint/no-confusing-void-expression': ['error', { ignoreArrowShorthand: true }],
       eqeqeq: ['error', 'always'],
       'no-console': ['warn', { allow: ['warn', 'error', 'info'] }],
     },

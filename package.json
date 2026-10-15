@@ -1,7 +1,7 @@
 {
   "name": "ledger-of-aims",
   "productName": "Ledger of Aims",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A calm, local-first ledger for four long-term goals.",
   "private": true,
   "main": "./out/main/index.js",

@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { MADANI_JUZ_START_PAGES, validateJuzStarts } from '../domain/quran/mushaf';
+import { DEFAULT_SCHEDULER as S } from '../domain/quran/scheduler';
 
 /**
  * Settings are stored per namespace as JSON. Every field has a default so that
@@ -28,6 +30,50 @@ export const profileSettingsSchema = z.object({
 });
 export type ProfileSettings = z.infer<typeof profileSettingsSchema>;
 
+const steps = (fallback: number[]) =>
+  z.array(z.number().int().min(1).max(60)).min(1).max(8).default(fallback);
+
+/** Spaced-repetition parameters (see domain/quran/scheduler.ts for the formulas). */
+export const schedulerSettingsSchema = z.object({
+  learningSteps: steps(S.learningSteps),
+  relearnSteps: steps(S.relearnSteps),
+  graduatingInterval: z.number().int().min(1).max(120).default(S.graduatingInterval),
+  initialEase: z.number().min(1.1).max(4).default(S.initialEase),
+  easeMin: z.number().min(1.05).max(3).default(S.easeMin),
+  easeMax: z.number().min(1.2).max(5).default(S.easeMax),
+  easeBonus: z.number().min(0).max(0.5).default(S.easeBonus),
+  shakyPenalty: z.number().min(0).max(1).default(S.shakyPenalty),
+  forgottenPenalty: z.number().min(0).max(1.5).default(S.forgottenPenalty),
+  shakyMultiplier: z.number().min(0.1).max(1).default(S.shakyMultiplier),
+  lapseMultiplier: z.number().min(0.05).max(1).default(S.lapseMultiplier),
+  lapseMinInterval: z.number().int().min(1).max(60).default(S.lapseMinInterval),
+  maxInterval: z.number().int().min(3).max(180).default(S.maxInterval),
+  loadBalanceFraction: z.number().min(0).max(0.3).default(S.loadBalanceFraction),
+});
+
+export const quranSettingsSchema = z.object({
+  /** Date the mushaf was set up (which juz were already memorised). */
+  setupOn: z.string().nullable().default(null),
+  direction: z.enum(['forward', 'backward']).default('forward'),
+  juzStartPages: z
+    .array(z.number().int())
+    .refine((v) => validateJuzStarts(v) === null, { message: 'Invalid juz boundaries' })
+    .default([...MADANI_JUZ_START_PAGES]),
+  baselinePagesPerWeek: z.number().min(0).max(60).default(5),
+  revisionMinutesPerDay: z.number().int().min(0).max(600).default(30),
+  minutesPerPage: z.number().min(0.5).max(30).default(3),
+  newLearningMinutesPerDay: z.number().int().min(0).max(600).default(20),
+  tolerancePages: z.number().int().min(0).max(60).default(2),
+  /** A one-day override of revision time ("I have 15 minutes today"). */
+  todayMinutes: z
+    .object({ date: z.string(), minutes: z.number().int().min(0).max(600) })
+    .nullable()
+    .default(null),
+  streakGraceDays: z.number().int().min(0).max(6).default(1),
+  scheduler: schedulerSettingsSchema.default({ ...S }),
+});
+export type QuranSettings = z.infer<typeof quranSettingsSchema>;
+
 export const windowSettingsSchema = z.object({
   bounds: z
     .object({
@@ -46,6 +92,7 @@ export const settingsSchemas = {
   general: generalSettingsSchema,
   onboarding: onboardingSettingsSchema,
   profile: profileSettingsSchema,
+  quran: quranSettingsSchema,
   window: windowSettingsSchema,
 } as const;
 

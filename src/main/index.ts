@@ -6,7 +6,8 @@ import { DomainError } from './errors';
 import type { RepoContext } from './db/repositories/context';
 import { getAllSettings, getSettings, updateSettings } from './db/repositories/settings';
 import { coreHandlers } from './ipc/handlers/core';
-import { setHandlers } from './ipc/register';
+import { quranHandlers } from './ipc/handlers/quran';
+import { broadcast, setHandlers } from './ipc/register';
 import type { PartialHandlerTable } from './ipc/types';
 import { buildAppMenu } from './menu';
 import { installNetworkGuard, type NetworkGuard } from './network-guard';
@@ -134,6 +135,7 @@ function openData(): boolean {
   setHandlers({
     ...baseHandlers(),
     ...core,
+    ...quranHandlers(context, broadcast),
     'settings.update': (input) => {
       const result = core['settings.update']?.(input);
       applyTheme(getSettings(context, 'general').theme);

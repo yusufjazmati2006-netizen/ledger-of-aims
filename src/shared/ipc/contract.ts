@@ -17,7 +17,18 @@ import {
   type ShiftType,
   type WeighIn,
 } from '../schemas/core';
-import { idSchema, patchSchema } from '../schemas/common';
+import { idSchema, localDateSchema, patchSchema } from '../schemas/common';
+import {
+  pageListSchema,
+  pageNumberSchema,
+  pageRecordSchema,
+  pageStateSchema,
+  quranSetupSchema,
+  ratingSchema,
+  type QuranMutation,
+  type QuranPagesPayload,
+  type ReviewEntry,
+} from '../schemas/quran';
 import { settingsSchemas, type SettingsMap } from '../schemas/settings';
 
 /**
@@ -33,7 +44,8 @@ import { settingsSchemas, type SettingsMap } from '../schemas/settings';
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- the type parameter is the point
 const out = <T>() => undefined as unknown as T;
 
-export type DataDomain = 'settings' | 'goals' | 'milestones' | 'shifts' | 'weighIns' | 'onboarding';
+export type DataDomain =
+  'settings' | 'goals' | 'milestones' | 'shifts' | 'weighIns' | 'onboarding' | 'quran';
 
 interface ChannelSpec {
   input: z.ZodType;
@@ -78,6 +90,7 @@ const settingsUpdateSchema = z.discriminatedUnion('namespace', [
   z.object({ namespace: z.literal('general'), patch: patchSchema(settingsSchemas.general) }),
   z.object({ namespace: z.literal('onboarding'), patch: patchSchema(settingsSchemas.onboarding) }),
   z.object({ namespace: z.literal('profile'), patch: patchSchema(settingsSchemas.profile) }),
+  z.object({ namespace: z.literal('quran'), patch: patchSchema(settingsSchemas.quran) }),
   z.object({ namespace: z.literal('window'), patch: patchSchema(settingsSchemas.window) }),
 ]);
 
@@ -155,6 +168,43 @@ export const contract = {
     mutates: ['onboarding', 'settings', 'weighIns', 'shifts'],
   },
 
+  // Quran
+  'quran.pages': { input: z.void(), output: out<QuranPagesPayload>() },
+  'quran.reviews': {
+    input: z.object({ from: localDateSchema, to: localDateSchema }),
+    output: out<ReviewEntry[]>(),
+  },
+  'quran.setup': {
+    input: quranSetupSchema,
+    output: out<QuranMutation>(),
+    mutates: ['quran', 'settings', 'milestones'],
+  },
+  'quran.learnNext': {
+    input: z.object({ count: z.number().int().min(1).max(40) }),
+    output: out<QuranMutation>(),
+    mutates: ['quran', 'milestones'],
+  },
+  'quran.setState': {
+    input: z.object({ pages: pageListSchema, state: pageStateSchema }),
+    output: out<QuranMutation>(),
+    mutates: ['quran', 'milestones'],
+  },
+  'quran.review': {
+    input: z.object({ pages: pageListSchema, rating: ratingSchema }),
+    output: out<QuranMutation>(),
+    mutates: ['quran', 'milestones'],
+  },
+  'quran.undo': {
+    input: z.object({ batchId: idSchema, before: z.array(pageRecordSchema).max(604) }),
+    output: out<null>(),
+    mutates: ['quran'],
+  },
+  'quran.setNote': {
+    input: z.object({ page: pageNumberSchema, note: z.string().max(2000) }),
+    output: out<null>(),
+    mutates: ['quran'],
+  },
+
   // Recovery (available when the database could not be opened)
   'recovery.restore': { input: z.object({ path: z.string().min(1) }), output: out<null>() },
   'recovery.startFresh': { input: z.void(), output: out<null>() },
@@ -194,5 +244,6 @@ export interface EventPayloads {
   'data:changed': { domains: DataDomain[] };
   navigate: { path: string };
   command: { id: 'quick-log' | 'palette' | 'export' | 'import' | 'backup-now' };
+  'milestone:completed': { milestone: Milestone };
 }
 export type EventName = keyof EventPayloads;

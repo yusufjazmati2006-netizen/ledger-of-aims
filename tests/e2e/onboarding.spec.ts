@@ -19,6 +19,12 @@ test('fresh launch: onboarding, seeded goals, and data that survives a restart',
   await page.getByLabel('Weight', { exact: true }).fill('66,4');
   await page.getByRole('button', { name: 'Continue' }).click();
 
+  // Mushaf: juz 16–30 memorised, continuing backward.
+  await expect(page.getByRole('heading', { name: 'Your memorisation so far' })).toBeVisible();
+  await page.getByRole('button', { name: 'Juz 16–30' }).click();
+  await expect(page.getByText('15 juz · 303 pages')).toBeVisible();
+  await page.getByRole('button', { name: 'Continue' }).click();
+
   // Shifts: set today (Thursday 15 Oct) to a morning shift.
   await expect(page.getByRole('heading', { name: 'This week’s shifts' })).toBeVisible();
   await page.getByRole('radiogroup', { name: 'Shift on 15 Oct 2026' }).getByText('Morning').click();

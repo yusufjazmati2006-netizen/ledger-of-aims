@@ -1,9 +1,13 @@
-import { diffDays, type LocalDate } from '../time/localDate';
+import { interpolateAt, slopeAt } from '../math/interpolate';
+import type { LocalDate } from '../time/localDate';
 
 export interface TrajectoryPoint {
   date: LocalDate;
   kg: number;
 }
+
+const asValues = (points: readonly TrajectoryPoint[]) =>
+  points.map((p) => ({ date: p.date, value: p.kg }));
 
 /**
  * The target weight on a given date, interpolated linearly between the starting
@@ -11,34 +15,10 @@ export interface TrajectoryPoint {
  * point the start weight applies; after the last checkpoint its weight holds.
  */
 export function targetWeightAt(points: readonly TrajectoryPoint[], date: LocalDate): number | null {
-  if (points.length === 0) return null;
-  const first = points[0];
-  if (!first) return null;
-  if (date <= first.date) return first.kg;
-  for (let i = 1; i < points.length; i++) {
-    const a = points[i - 1];
-    const b = points[i];
-    if (!a || !b) continue;
-    if (date <= b.date) {
-      const span = diffDays(a.date, b.date);
-      if (span <= 0) return b.kg;
-      const t = diffDays(a.date, date) / span;
-      return a.kg + (b.kg - a.kg) * t;
-    }
-  }
-  return points[points.length - 1]?.kg ?? null;
+  return interpolateAt(asValues(points), date);
 }
 
 /** Required rate (kg per week) on the trajectory segment containing `date`. */
 export function requiredWeeklyRate(points: readonly TrajectoryPoint[], date: LocalDate): number {
-  for (let i = 1; i < points.length; i++) {
-    const a = points[i - 1];
-    const b = points[i];
-    if (!a || !b) continue;
-    if (date < b.date) {
-      const span = diffDays(a.date, b.date);
-      return span > 0 ? ((b.kg - a.kg) / span) * 7 : 0;
-    }
-  }
-  return 0;
+  return slopeAt(asValues(points), date) * 7;
 }

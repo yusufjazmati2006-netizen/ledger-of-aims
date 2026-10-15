@@ -6,7 +6,7 @@ physique — planned around a cafe shift pattern.
 
 Everything stays on your Mac. No accounts, no cloud, no telemetry, no network.
 
-> **Status:** Phase 1 of 9 (foundations) is complete. See [CHANGELOG.md](CHANGELOG.md)
+> **Status:** Phases 1–2 of 9 are complete (foundations; Quran module). See [CHANGELOG.md](CHANGELOG.md)
 > for what works today and [TODO.md](TODO.md) for what is still to come.
 
 ## Quick start (developers)

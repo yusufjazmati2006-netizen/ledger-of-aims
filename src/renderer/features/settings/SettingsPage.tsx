@@ -10,6 +10,7 @@ import { Card, PageHeader } from '../../design/Card';
 import { Field, SegmentedControl, Select, Switch, TextInput } from '../../design/Field';
 import { Button } from '../../design/Button';
 import { Icon } from '../../design/icons';
+import { QuranSettingsSection } from './QuranSettings';
 
 function SettingsSection({
   id,
@@ -110,6 +111,14 @@ export function SettingsPage() {
               ))}
             </Select>
           </Field>
+        </SettingsSection>
+
+        <SettingsSection
+          id="quran"
+          title="Quran"
+          description="Revision time, pace and the spaced-repetition scheduler. Every formula is shown with its parameters."
+        >
+          <QuranSettingsSection />
         </SettingsSection>
 
         <SettingsSection

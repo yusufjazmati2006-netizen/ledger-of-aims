@@ -31,8 +31,9 @@ export function Ring({
     <div
       className={cx('relative inline-flex shrink-0 items-center justify-center', className)}
       style={{ width: size, height: size }}
-      role="img"
-      aria-label={label}
+      role={label ? 'img' : undefined}
+      aria-label={label || undefined}
+      aria-hidden={label ? undefined : true}
     >
       <svg width={size} height={size} className="-rotate-90" aria-hidden="true">
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={track} strokeWidth={stroke} />

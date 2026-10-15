@@ -2,6 +2,9 @@ import { useEffect } from 'react';
 import { createHashRouter, RouterProvider } from 'react-router';
 import { useApp } from '../stores/app';
 import { Toaster } from '../design/Toaster';
+import { Celebration } from '../features/celebration/Celebration';
+import { useCelebration } from '../stores/celebration';
+import { onDataChanged } from '../lib/api';
 import { Shell } from './Shell';
 import { RecoveryScreen } from '../features/recovery/RecoveryScreen';
 import { Onboarding } from '../features/onboarding/Onboarding';
@@ -9,6 +12,11 @@ import { TodayPage } from '../features/today/TodayPage';
 import { MilestonesPage } from '../features/milestones/MilestonesPage';
 import { SettingsPage } from '../features/settings/SettingsPage';
 import { NotFound } from './NotFound';
+import { QuranPage } from '../features/quran/QuranPage';
+import { QuranOverview } from '../features/quran/QuranOverview';
+import { RevisionPage } from '../features/quran/RevisionPage';
+import { MushafPage } from '../features/quran/MushafPage';
+import { LearningLogPage } from '../features/quran/LearningLogPage';
 
 const router = createHashRouter([
   {
@@ -16,6 +24,16 @@ const router = createHashRouter([
     element: <Shell />,
     children: [
       { index: true, element: <TodayPage /> },
+      {
+        path: 'quran',
+        element: <QuranPage />,
+        children: [
+          { index: true, element: <QuranOverview /> },
+          { path: 'revision', element: <RevisionPage /> },
+          { path: 'mushaf', element: <MushafPage /> },
+          { path: 'log', element: <LearningLogPage /> },
+        ],
+      },
       { path: 'milestones', element: <MilestonesPage /> },
       { path: 'settings', element: <SettingsPage /> },
       { path: '*', element: <NotFound /> },
@@ -34,6 +52,26 @@ export function App() {
   useEffect(() => {
     void bootstrap();
   }, [bootstrap]);
+
+  // Settings can change in the main process (e.g. mushaf set-up, or another window).
+  const refreshSettings = useApp((s) => s.refreshSettings);
+  useEffect(
+    () =>
+      onDataChanged((domains) => {
+        if (domains.includes('settings')) void refreshSettings();
+      }),
+    [refreshSettings],
+  );
+
+  // Milestones completed automatically by the main process (e.g. "25 juz").
+  const celebrate = useCelebration((s) => s.celebrate);
+  useEffect(
+    () =>
+      window.ledger.on('milestone:completed', ({ milestone }) => {
+        celebrate(milestone);
+      }),
+    [celebrate],
+  );
 
   // Night shifts end after midnight, so "today" must roll over while the app is open.
   useEffect(() => {
@@ -68,6 +106,7 @@ export function App() {
     <>
       {onboarded ? <RouterProvider router={router} /> : <Onboarding />}
       <Toaster />
+      <Celebration />
     </>
   );
 }

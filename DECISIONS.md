@@ -18,6 +18,12 @@ reasoning. Anything here can be revisited; most are editable defaults in the app
 - **Zustand** holds app-wide state (settings, today); screen data comes from a small
   stale-while-revalidate hook (`useLedger`) that refreshes on `data:changed` events
   broadcast by the main process after every mutation. No extra query library.
+- **Lint:** `no-confusing-void-expression` allows arrow shorthand so idiomatic React
+  handlers (`onClick={() => setOpen(true)}`) need no ceremony.
+- **Charts** use Recharts with colours read from the design tokens at runtime (SVG
+  attributes cannot resolve CSS variables). Reference lines use a neutral grey chosen
+  with the dataviz palette validator to stay distinguishable from every goal accent
+  under colour-vision deficiency, in both themes.
 - **Zod 4 patches:** `.partial()` still applies field defaults in Zod 4, so a
   one-field patch would reset other fields. All patch schemas use `patchSchema()`,
   which strips defaults (found by an end-to-end test; covered by a unit test).
@@ -48,6 +54,32 @@ reasoning. Anything here can be revisited; most are editable defaults in the app
 - Degree completion ("about autumn 2029") is seeded as 31 Oct 2029 and labelled
   _expected_; no term dates are invented.
 - Only the game goal is seeded with a "next single action"; the others start blank.
+
+## Quran module
+
+- **Page states.** "New" means _recently learned_ (still in its learning steps),
+  "In revision" means _being relearnt after a lapse_, and pages not yet learned are
+  shown blank ("not started"). Learned pages of any state count towards progress.
+- **Pages, not juz, are the unit of scheduling.** Juz figures (rings, retention) are
+  aggregates of their pages, and rating a whole juz rates each of its pages.
+- **Mushaf layout.** The default is the 15-line Madani print's juz start pages
+  (structural page numbers only); editable in Settings → Quran → Mushaf layout.
+- **Backward memorisation** takes each juz from its first page, then moves to the
+  previous juz (e.g. after juz 16–30, the next page is 282, the start of juz 15).
+- **Milestones in juz → pages.** Converted exactly using the layout and the order in
+  which juz will be completed (complete juz, then partly learned, then untouched juz
+  in learning order). With juz 16–30 memorised, 20 juz = 404 pages.
+- **Target line** runs from the pages learned before 15 Oct 2026 through each Quran
+  milestone, linearly. "On track" means within ±2 pages (editable).
+- **Rolling pace** blends in the declared baseline (5 pages/week) for days before
+  tracking began, until 28 days of data exist; the screen says so.
+- **Learning log** is derived from each page's learned date rather than a separate
+  log table, so it can never disagree with the mushaf.
+- **Revision streak** counts a day when at least one revision was recorded; one
+  missed day in any seven is forgiven by default (editable).
+- Quran milestones are completed automatically when reached but never un-completed
+  automatically (an Undo of pages leaves the milestone as it is; untick it manually).
+- Scheduler changes apply to future reviews; existing due dates are not rewritten.
 
 ## Privacy
 

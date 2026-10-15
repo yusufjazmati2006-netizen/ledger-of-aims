@@ -17,9 +17,11 @@ import { LabeledInput, SegmentedControl } from '../../design/Field';
 import { Icon } from '../../design/icons';
 import { GOAL_META } from '../../lib/goals';
 import { cx } from '../../lib/cx';
+import type { Direction } from '@shared/domain/quran/progress';
+import { JuzPicker } from '../quran/JuzPicker';
 
-type Step = 'welcome' | 'weight' | 'shifts' | 'ready';
-const STEPS: Step[] = ['welcome', 'weight', 'shifts', 'ready'];
+type Step = 'welcome' | 'weight' | 'mushaf' | 'shifts' | 'ready';
+const STEPS: Step[] = ['welcome', 'weight', 'mushaf', 'shifts', 'ready'];
 
 /**
  * First-launch flow. It collects only what the app cannot sensibly guess — the
@@ -39,6 +41,10 @@ export function Onboarding() {
     [weekStart],
   );
   const [shifts, setShifts] = useState<Record<string, string>>({});
+  const [juz, setJuz] = useState<number[]>([]);
+  const [direction, setDirection] = useState<Direction>('backward');
+  // 'later' = the user chose to set up the mushaf from the Quran screen instead.
+  const [mushaf, setMushaf] = useState<'now' | 'later'>('now');
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
@@ -57,7 +63,7 @@ export function Onboarding() {
       return;
     }
     setWeightError(null);
-    setStep('shifts');
+    setStep('mushaf');
   };
 
   const finish = async () => {
@@ -74,6 +80,7 @@ export function Onboarding() {
         units: unit,
         weekShifts: Object.entries(shifts).map(([date, shiftTypeId]) => ({ date, shiftTypeId })),
       });
+      if (mushaf === 'now') await api('quran.setup', { juz, direction });
       await bootstrap();
     } catch (error) {
       setSaveError(error instanceof ApiError ? error.message : 'Could not save. Please try again.');
@@ -140,7 +147,7 @@ export function Onboarding() {
           {step === 'weight' ? (
             <form onSubmit={submitWeight}>
               <StepFrame
-                eyebrow="Step 1 of 2"
+                eyebrow="Step 1 of 3"
                 title="Your starting weight"
                 body={
                   <p>
@@ -191,6 +198,52 @@ export function Onboarding() {
             </form>
           ) : null}
 
+          {step === 'mushaf' ? (
+            <StepFrame
+              eyebrow="Step 2 of 3"
+              title="Your memorisation so far"
+              body={
+                <p>
+                  Tick the juz you have already memorised. Their first revision is spread over the
+                  coming weeks, so day one is a normal day. Individual pages can be adjusted later.
+                </p>
+              }
+            >
+              <JuzPicker
+                selected={juz}
+                onChange={setJuz}
+                direction={direction}
+                onDirectionChange={setDirection}
+              />
+              <div className="mt-8 flex flex-wrap items-center gap-2">
+                <Button
+                  variant="primary"
+                  size="lg"
+                  iconRight="arrowRight"
+                  onClick={() => {
+                    setMushaf('now');
+                    setStep('shifts');
+                  }}
+                >
+                  Continue
+                </Button>
+                <Button variant="ghost" size="lg" onClick={() => setStep('weight')}>
+                  Back
+                </Button>
+                <button
+                  type="button"
+                  className="ml-auto text-[13px] font-medium text-ink-muted underline-offset-2 hover:text-ink hover:underline"
+                  onClick={() => {
+                    setMushaf('later');
+                    setStep('shifts');
+                  }}
+                >
+                  Set up later
+                </button>
+              </div>
+            </StepFrame>
+          ) : null}
+
           {step === 'shifts' ? (
             <ShiftStep
               week={week}
@@ -198,7 +251,7 @@ export function Onboarding() {
               shifts={shifts}
               onChange={setShifts}
               onBack={() => {
-                setStep('weight');
+                setStep('mushaf');
               }}
               onNext={() => {
                 setStep('ready');
@@ -275,7 +328,7 @@ function ShiftStep({
   };
   return (
     <StepFrame
-      eyebrow="Step 2 of 2"
+      eyebrow="Step 3 of 3"
       title="This week’s shifts"
       body={
         <p>

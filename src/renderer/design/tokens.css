@@ -24,6 +24,9 @@
   --focus: #2f5bd3;
   --sidebar: #efebe3;
   --scrim: rgb(29 28 26 / 0.28);
+  /* Neutral reference series (targets, baselines) — validated against every goal
+     accent for colour-vision deficiency with the dataviz palette checker. */
+  --chart-reference: #948c7f;
 
   /* Goal accents — light */
   --quran: #1d6a5a;
@@ -61,6 +64,7 @@
     --focus: #86a8ff;
     --sidebar: #1a1917;
     --scrim: rgb(0 0 0 / 0.5);
+    --chart-reference: #7a7367;
 
     --quran: #6cc2ad;
     --quran-soft: #1a2c27;
@@ -112,6 +116,7 @@
   --color-rule: var(--rule);
   --color-rule-strong: var(--rule-strong);
   --color-control: var(--control);
+  --color-chart-reference: var(--chart-reference);
   --color-focus: var(--focus);
   --color-sidebar: var(--sidebar);
   --color-scrim: var(--scrim);

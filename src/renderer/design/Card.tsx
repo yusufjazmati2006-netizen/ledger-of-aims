@@ -86,7 +86,7 @@ export function Stat({
     <div className={cx('min-w-0', className)}>
       <div className="eyebrow">{label}</div>
       <div className="mt-1 flex items-baseline gap-1">
-        <span className="tabular font-serif text-[26px] leading-none font-semibold text-ink">
+        <span className="text-[24px] leading-none font-semibold tracking-[-0.01em] text-ink">
           {value}
         </span>
         {unit ? <span className="text-[13px] text-ink-muted">{unit}</span> : null}

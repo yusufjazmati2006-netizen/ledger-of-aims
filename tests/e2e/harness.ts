@@ -46,11 +46,25 @@ export async function launchApp(
   return { app, page, userData, backups };
 }
 
-/** Completes onboarding with the given starting weight (kg). */
-export async function completeOnboarding(page: Page, weightKg = '66.4'): Promise<void> {
+/**
+ * Completes onboarding with the given starting weight (kg). By default juz 16–30
+ * are marked memorised (continuing backward); pass `juz: null` to set up later.
+ */
+export async function completeOnboarding(
+  page: Page,
+  weightKg = '66.4',
+  options: { juz?: 'juz16to30' | null } = {},
+): Promise<void> {
   await page.getByRole('button', { name: 'Begin' }).click();
   await page.getByLabel('Weight', { exact: true }).fill(weightKg);
   await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('heading', { name: 'Your memorisation so far' }).waitFor();
+  if (options.juz === null) {
+    await page.getByRole('button', { name: 'Set up later' }).click();
+  } else {
+    await page.getByRole('button', { name: 'Juz 16–30' }).click();
+    await page.getByRole('button', { name: 'Continue' }).click();
+  }
   await page.getByRole('heading', { name: 'This week’s shifts' }).waitFor();
   await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByRole('button', { name: 'Open today' }).click();

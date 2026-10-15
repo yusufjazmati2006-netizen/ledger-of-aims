@@ -10,6 +10,7 @@ export interface NavItem {
 
 export const NAV_ITEMS: readonly NavItem[] = [
   { path: '/', label: 'Today' },
+  { path: '/quran', label: 'Quran', goal: 'quran' },
   { path: '/milestones', label: 'Milestones' },
 ];
 
