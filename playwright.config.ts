@@ -7,7 +7,8 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   retries: 0,
-  reporter: [['list']],
+  // On GitHub Actions, failures also appear as annotations on the run.
+  reporter: process.env.GITHUB_ACTIONS ? [['list'], ['github']] : [['list']],
   use: {
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
