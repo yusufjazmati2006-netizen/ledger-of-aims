@@ -18,6 +18,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { path: '/planner', label: 'Planner' },
   { path: '/review', label: 'Weekly review' },
   { path: '/milestones', label: 'Milestones' },
+  { path: '/search', label: 'Search' },
 ];
 
 export const SETTINGS_PATH = '/settings';

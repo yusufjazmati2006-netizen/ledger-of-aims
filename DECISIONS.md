@@ -196,6 +196,29 @@ reasoning. Anything here can be revisited; most are editable defaults in the app
   Plan-block reminders and the forgotten-timer alert ignore the shift hold (you asked
   for the block), but not quiet hours.
 
+## Backups, export and search
+
+- **Backups are SQLite copies** made with `VACUUM INTO` (consistent while the app is
+  running), named `ledger-<kind>-<time>.sqlite`. Kept: 30 daily, 20 manual, 10 of each
+  safety snapshot (before a restore, an import or an update). Files with other names in
+  the folder are listed but never pruned.
+- **Photos are mirrored, not copied per backup**: they never change once written, so
+  one `photos/` folder beside the backups holds every photo any backup refers to; a
+  deleted photo stays there. Restoring copies back only what is missing.
+- **The backup location is stored outside the database** (`backup-location.json` in
+  the data folder) so recovery can read it when the database cannot be opened.
+- **Restore and import always snapshot first**; nothing in Ledger of Aims overwrites
+  your data without leaving a copy.
+- **JSON export** contains every table of your data (not the migration ledger, the
+  notification log or the search index) plus, optionally, photos as base64. Import
+  replaces everything; tables an older export lacks start empty and are re-seeded.
+- **Calendar export** writes floating local times (no time zone), so a 16:00 shift
+  shows at 16:00 wherever your calendar is set.
+- **Search** uses SQLite FTS5 with accents folded (“cafe” finds “café”) and
+  transliteration marks dropped (“murajaah” finds “murajaʿah”; matched passages are shown
+  without the marks). The index is rebuilt whole when data has changed since the last search
+  — milliseconds at this scale, and it cannot drift out of step with the data.
+
 ## Planner rules
 
 - Default sleep 8 h, wind-down 30 min, morning routine 30 min, commute 20 min each way,

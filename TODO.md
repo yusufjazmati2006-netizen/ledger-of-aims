@@ -10,10 +10,17 @@ Known gaps and follow-ups. Phases refer to the plan in the README.
 - [x] Phase 5 — Game module.
 - [x] Phase 6 — Today actions, shift-aware planner, weekly review.
 - [x] Phase 7 — Tray, global shortcut, command palettes, notifications.
-- [ ] Phase 8 — Backups, JSON import/export, `.ics` export, search.
+- [x] Phase 8 — Backups, JSON import/export, `.ics` export, search.
 - [ ] Phase 9 — Packaging (`npm run dist`), macOS CI, README, full E2E, a11y/perf.
 
 ## Known gaps
+
+- Backups run while the app is open; a day the app is never opened has no backup (none
+  is needed — nothing changed). The backup folder on an unmounted external drive shows
+  an error in Settings rather than falling back silently.
+- Import replaces all data; merging two ledgers is not supported.
+- The photos mirror in the backup folder grows with every photo ever added; old photos
+  can be removed from it by hand.
 
 - Notifications only appear while the app is running; there is no launch-at-login
   option yet (macOS can add it under System Settings → General → Login Items).
@@ -22,8 +29,6 @@ Known gaps and follow-ups. Phases refer to the plan in the README.
   seen).
 - Quick log cannot yet log food (`f oats`) or a workout set (`bench 60x8`); both need a
   fuzzy match against your favourites and exercises.
-- Search in the palette covers screens and actions; searching your own notes and
-  entries arrives with Phase 8.
 
 - Planner: blocks cannot cross midnight, and resizing is done in the edit dialog rather
   than by dragging an edge.
@@ -40,16 +45,11 @@ Known gaps and follow-ups. Phases refer to the plan in the README.
   policies and resits are not modelled; add them once Arden's regulations are known.
 - Physique: an adaptive maintenance estimate (from intake vs trend change) would make
   calorie targets self-correcting; not yet implemented.
-- Physique: photos are backed up with the data folder in Phase 8; JSON export will
-  include them only on request (they can be large).
 - Physique: the meal-prep shopping list's ticks are not saved between visits.
 - Quran: the revision queue is still sized from Settings or the Quran screen's chip,
   not from the planner's revision block length.
 - Quran: an "Undo" of learned pages does not un-complete a milestone that the change
   completed (by design; untick it on the Milestones screen if needed).
-- Quran: per-page notes are searchable only once Phase 8 adds search.
-- The recovery screen restores from the default backup folder only; a custom
-  backup location (Phase 8) must also be readable when the database is damaged.
 - macOS-specific visuals (vibrancy, traffic-light alignment) are untested on a real
   Mac — development happens in a Linux container. Please check on first run.
 - The renderer bundle is ~3 MB in one chunk; route-level code splitting could

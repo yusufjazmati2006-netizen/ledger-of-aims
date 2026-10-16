@@ -3,6 +3,13 @@ import { defineConfig } from 'electron-vite';
 import type { Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
+import { readFileSync } from 'node:fs';
+
+/** The version from package.json, fixed at build time (Electron's app.getVersion() reads
+ * the package.json beside the entry point, which is absent when running from `out/`). */
+const version = (
+  JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf8')) as { version: string }
+).version;
 
 const alias = {
   '@shared': resolve(__dirname, 'src/shared'),
@@ -44,6 +51,7 @@ function contentSecurityPolicy(): Plugin {
 export default defineConfig({
   main: {
     resolve: { alias },
+    define: { __APP_VERSION__: JSON.stringify(version) },
     build: {
       rolldownOptions: {
         input: { index: resolve(__dirname, 'src/main/index.ts') },

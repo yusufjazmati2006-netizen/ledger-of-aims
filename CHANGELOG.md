@@ -2,6 +2,48 @@
 
 All notable changes, by phase.
 
+## [0.8.0] — Phase 8: Backups, export and search
+
+### Added
+
+- **Daily backups**, automatic and local: the first time the app runs each day (and
+  every half hour after midnight while it stays open) a consistent copy of the
+  database goes to `~/Documents/LedgerOfAims Backups`; the last 30 daily copies are
+  kept. Photos are mirrored alongside (copied once, never deleted), so every backup's
+  photos stay restorable. **Back up now** makes a manual copy.
+- **A backup folder of your choosing** (an external drive or a synced folder). Its
+  location lives in a small file outside the database, so the recovery screen still
+  finds your backups when the database itself is damaged.
+- **Restore** from Settings → Backups or from any `.sqlite` file: the current data is
+  first saved as a “Before a restore” backup, the photos the backup needs are put
+  back, and the app reloads. Restoring is therefore always undoable.
+- **JSON export** of everything (photos optional) and **import** with a preview of
+  what changes, table by table, before anything is replaced. Imports are validated
+  (format, version, every table and column), snapshot the current data first, run in
+  one transaction and are rolled back entirely if any link between records is broken.
+  An export from a newer version is refused.
+- **Calendar export (.ics)** of milestones, deadlines, and the next eight weeks of plan
+  blocks and shifts, with stable event ids so re-importing updates rather than
+  duplicates; night shifts end on the following morning.
+- **Search** (⌘9, and inside ⌘K): full-text, prefix-matching search across milestones,
+  the roadmap, learning notes and engine decisions, practice projects, the devlog
+  (including tags), the Steam checklist, modules and assessments, Quran page notes,
+  weekly reviews, habits, notes on time, study, workouts, weigh-ins and photos, and
+  foods and exercises — with the matches highlighted.
+- Migration `008_search` (an FTS5 index, rebuilt from your data when it has changed).
+
+### Fixed
+
+- Development and test builds reported version “0.0”; the version now comes from
+  package.json at build time.
+
+### Tests
+
+- 297 unit tests (adding the calendar writer, search with accents and transliteration
+  marks, backups and retention, export/import round trip, refusals and rollback) and 19
+  end-to-end flows, including restoring after a damaged database from a custom backup
+  folder.
+
 ## [0.7.0] — Phase 7: Quick log, menu bar and notifications
 
 ### Added

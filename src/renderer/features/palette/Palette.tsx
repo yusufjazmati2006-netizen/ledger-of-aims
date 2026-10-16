@@ -6,6 +6,8 @@ import { Icon, type IconName } from '../../design/icons';
 import { Kbd } from '../../design/Card';
 import { PALETTE_ENTRIES, searchEntries } from './entries';
 import { useQuickLog, type QuickOutcome } from './useQuickLog';
+import { useLedger } from '../../lib/useLedger';
+import { SEARCH_DOMAINS } from '../search/Highlight';
 
 interface Row {
   id: string;
@@ -46,6 +48,12 @@ export function Palette({
   const input = useRef<HTMLInputElement>(null);
   const listId = useId();
   const quick = useQuickLog(text);
+  const searchText = quick.parsed.status === 'none' ? text.trim() : '';
+  const found = useLedger(
+    'search.query',
+    { q: searchText, limit: 4 },
+    { domains: [...SEARCH_DOMAINS] },
+  );
 
   if (resetSignal !== lastReset) {
     setLastReset(resetSignal);
@@ -114,6 +122,26 @@ export function Palette({
           if (e.path) onNavigate(e.path);
           else if (e.insert !== undefined) type(e.insert);
         },
+      });
+    }
+    // What you have written: the best few matches, and a way to see them all.
+    if (searchText.length >= 2) {
+      for (const h of (found.data ?? []).slice(0, 4)) {
+        rows.push({
+          id: `hit:${h.kind}:${h.ref}`,
+          label: h.title,
+          detail: undefined,
+          icon: 'search',
+          group: 'In your notes',
+          action: () => onNavigate(h.path),
+        });
+      }
+      rows.push({
+        id: 'search-all',
+        label: `Search everything for “${searchText}”`,
+        icon: 'search',
+        group: 'In your notes',
+        action: () => onNavigate(`/search?q=${encodeURIComponent(searchText)}`),
       });
     }
   }

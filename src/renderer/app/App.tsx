@@ -37,6 +37,7 @@ import { TimePage } from '../features/game/TimePage';
 import { DevlogPage } from '../features/game/DevlogPage';
 import { SteamPage } from '../features/game/SteamPage';
 import { PlannerPage } from '../features/planner/PlannerPage';
+import { SearchPage } from '../features/search/SearchPage';
 import { ReviewPage } from '../features/review/ReviewPage';
 import { ReviewWeekPage } from '../features/review/ReviewWeekPage';
 import { HistoryPage } from '../features/review/HistoryPage';
@@ -102,6 +103,7 @@ const router = createHashRouter([
         ],
       },
       { path: 'milestones', element: <MilestonesPage /> },
+      { path: 'search', element: <SearchPage /> },
       { path: 'settings', element: <SettingsPage /> },
       { path: '*', element: <NotFound /> },
     ],

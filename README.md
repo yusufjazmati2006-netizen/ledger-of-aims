@@ -6,7 +6,7 @@ physique — planned around a cafe shift pattern.
 
 Everything stays on your Mac. No accounts, no cloud, no telemetry, no network.
 
-> **Status:** Phases 1–7 of 9 are complete (foundations; Quran; Physique; Degree; Game; Today, planner and weekly review; quick log and notifications). See [CHANGELOG.md](CHANGELOG.md)
+> **Status:** Phases 1–8 of 9 are complete (foundations; Quran; Physique; Degree; Game; Today, planner and weekly review; quick log and notifications; backups, export and search). See [CHANGELOG.md](CHANGELOG.md)
 > for what works today and [TODO.md](TODO.md) for what is still to come.
 
 ## Quick start (developers)
@@ -57,9 +57,21 @@ offers the same quick log and starts or stops the game timer, showing its runnin
 | ------------------------------- | ---------------------------------------------------------- |
 | Database                        | `~/Library/Application Support/LedgerOfAims/ledger.sqlite` |
 | Quarantined (damaged) databases | `~/Library/Application Support/LedgerOfAims/quarantine/`   |
-| Backups (Phase 8)               | `~/Documents/LedgerOfAims Backups/`                        |
+| Backups (daily, last 30 kept)   | `~/Documents/LedgerOfAims Backups/` (changeable)           |
 
 **Settings → Data & privacy → Reveal** opens the data folder.
+
+### Backup and restore
+
+- A backup is made automatically on each day you use the app; the last 30 are kept, and
+  your progress photos are mirrored beside them. **Settings → Backups → Back up now**
+  makes one on demand; **Change…** moves backups to an external drive or synced folder.
+- **Restore…** next to any backup (or **Restore from a file…**) replaces your data with
+  it. Your current data is saved first as a “Before a restore” backup, so a restore can
+  always be undone.
+- **Settings → Export & import** saves everything as one JSON file (optionally with
+  photos) and imports such a file after showing what will change. Calendars (.ics) of
+  milestones, deadlines, plans and shifts can be exported for Apple Calendar.
 
 If the database is ever damaged, Ledger of Aims opens a recovery screen instead of
 the app. From there you can restore a backup, or start fresh. Either way, the damaged

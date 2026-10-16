@@ -6,6 +6,7 @@ import m004 from './004_degree.sql?raw';
 import m005 from './005_game.sql?raw';
 import m006 from './006_planning.sql?raw';
 import m007 from './007_notifications.sql?raw';
+import m008 from './008_search.sql?raw';
 
 /**
  * Ordered list of schema migrations. Never edit a migration that has shipped;
@@ -19,4 +20,5 @@ export const migrations: readonly Migration[] = [
   { id: '005_game', sql: m005 },
   { id: '006_planning', sql: m006 },
   { id: '007_notifications', sql: m007 },
+  { id: '008_search', sql: m008 },
 ];

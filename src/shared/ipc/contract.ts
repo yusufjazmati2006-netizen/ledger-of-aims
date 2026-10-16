@@ -89,6 +89,12 @@ import type { Dependency } from '../domain/game/roadmap';
 import { settingsSchemas, type SettingsMap } from '../schemas/settings';
 import type { PendingNotification } from '../domain/notifications/schedule';
 import {
+  calendarExportSchema,
+  type BackupStatus,
+  type ImportPreview,
+  type SearchHit,
+} from '../schemas/data';
+import {
   habitInputSchema,
   reviewInputSchema,
   type Habit,
@@ -125,7 +131,8 @@ export type DataDomain =
   | 'plan'
   | 'game'
   | 'review'
-  | 'habits';
+  | 'habits'
+  | 'backups';
 
 interface ChannelSpec {
   input: z.ZodType;
@@ -143,6 +150,8 @@ export interface RecoveryInfo {
 export interface BackupFile {
   path: string;
   name: string;
+  /** daily, manual, pre-restore, pre-import, pre-migration — or "other" for any file. */
+  label: string;
   createdAt: string;
   sizeBytes: number;
   valid: boolean;
@@ -201,8 +210,8 @@ export const contract = {
     input: z.object({
       path: z
         .string()
-        .regex(/^\/[\w/-]*$/)
-        .max(100),
+        .regex(/^\/[\w/-]*(\?[\w%=&.+~-]*)?$/)
+        .max(300),
     }),
     output: out<null>(),
   },
@@ -212,6 +221,44 @@ export const contract = {
   /** Runs the reminder check now and returns what was sent. */
   'notifications.runNow': { input: z.void(), output: out<PendingNotification[]>() },
   'notifications.test': { input: z.void(), output: out<{ supported: boolean }>() },
+
+  // Backups, restore, export / import, calendar and search
+  'backups.status': { input: z.void(), output: out<BackupStatus>() },
+  'backups.list': { input: z.void(), output: out<BackupFile[]>() },
+  'backups.create': { input: z.void(), output: out<BackupFile>(), mutates: ['backups'] },
+  'backups.chooseFolder': {
+    input: z.void(),
+    output: out<BackupStatus | null>(),
+    mutates: ['backups'],
+  },
+  'backups.useDefaultFolder': {
+    input: z.void(),
+    output: out<BackupStatus>(),
+    mutates: ['backups'],
+  },
+  'backups.reveal': { input: z.void(), output: out<null>() },
+  /** Picks a backup file from anywhere; it is validated and may then be restored. */
+  'backups.chooseFile': { input: z.void(), output: out<BackupFile | null>() },
+  /** Snapshots the current data, restores the backup and reloads the app. */
+  'backups.restore': { input: z.object({ path: z.string().min(1) }), output: out<null>() },
+  'data.export': {
+    input: z.object({ includePhotos: z.boolean().default(false) }),
+    output: out<{ path: string; bytes: number } | null>(),
+  },
+  'data.importChoose': { input: z.void(), output: out<ImportPreview | null>() },
+  /** Snapshots the current data, replaces it with the previewed export and reloads. */
+  'data.importApply': { input: z.object({ token: z.string().min(1) }), output: out<null>() },
+  'calendar.export': {
+    input: calendarExportSchema,
+    output: out<{ path: string; events: number } | null>(),
+  },
+  'search.query': {
+    input: z.object({
+      q: z.string().max(200),
+      limit: z.number().int().min(1).max(100).default(30),
+    }),
+    output: out<SearchHit[]>(),
+  },
   'diagnostics.networkLog': {
     input: z.void(),
     output: out<{ blocked: { url: string; at: string }[] }>(),

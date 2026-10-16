@@ -4,6 +4,7 @@ import { defineConfig } from 'vitest/config';
 const resolve = (_root: string, path: string) => fileURLToPath(new URL(path, import.meta.url));
 
 export default defineConfig({
+  define: { __APP_VERSION__: JSON.stringify('test') },
   resolve: {
     alias: {
       '@shared': resolve('', './src/shared'),

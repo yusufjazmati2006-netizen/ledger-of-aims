@@ -35,6 +35,14 @@ import {
 } from './services/database';
 import { listBackupFiles } from './services/backupFiles';
 import { createMainWindow, loadRenderer } from './window';
+import { dirname } from 'node:path';
+import type { ExportFile } from '@shared/schemas/data';
+import { readBackupDirectory, writeBackupDirectory } from './services/backupConfig';
+import { createBackup, needsDailyBackup, restorePhotos } from './services/backup';
+import { applyImport } from './services/exchange';
+import { invalidateSearch } from './services/search';
+import { seedDatabase } from './db/seed';
+import { dataHandlers } from './ipc/handlers/data';
 import { createQuickLog } from './quickWindow';
 import { createTray } from './tray';
 import { startNotifier, type Notifier } from './services/notifier';
@@ -156,7 +164,7 @@ function systemHandlers(): PartialHandlerTable {
 function appInfo(): AppInfo {
   const paths = dataPaths();
   return {
-    version: app.getVersion(),
+    version: __APP_VERSION__,
     platform: process.platform,
     dataPath: paths.userData,
     dbPath: paths.db,
@@ -164,8 +172,69 @@ function appInfo(): AppInfo {
   };
 }
 
+/** The chosen backup folder, read from a file outside the database (see backupConfig). */
 function backupDirectory(): string {
-  return dataPaths().defaultBackups;
+  const paths = dataPaths();
+  return readBackupDirectory(paths.userData, paths.defaultBackups);
+}
+
+let lastBackupError: string | null = null;
+let backupTimer: NodeJS.Timeout | undefined;
+
+/** Makes today's backup if there is none yet; checked at start-up and every half hour. */
+function runDailyBackup(): void {
+  if (!ctx) return;
+  try {
+    const dir = backupDirectory();
+    if (needsDailyBackup(listBackupFiles(dir), clock.now())) {
+      createBackup({ db: ctx.db, dir, photosDir: dataPaths().photos, label: 'daily', clock });
+      broadcast('data:changed', { domains: ['backups'] });
+    }
+    lastBackupError = null;
+  } catch (error) {
+    lastBackupError = error instanceof Error ? error.message : String(error);
+    console.error('[backup] daily backup failed:', lastBackupError);
+  }
+}
+
+/** Closes the database, swaps in the backup (after a snapshot) and reopens everything. */
+function restoreFromBackup(path: string): void {
+  if (!ctx) return;
+  const paths = dataPaths();
+  const dir = backupDirectory();
+  createBackup({ db: ctx.db, dir, photosDir: paths.photos, label: 'pre-restore', clock });
+  ctx.db.close();
+  ctx = null;
+  restoreDatabaseFile(path, paths.db);
+  restorePhotos(dir, paths.photos);
+  restorePhotos(dirname(path), paths.photos);
+  invalidateSearch();
+  reloadEverything();
+}
+
+/** Replaces all data with an export (after a snapshot), then reloads. */
+function importExport(file: ExportFile): void {
+  if (!ctx) return;
+  const paths = dataPaths();
+  createBackup({
+    db: ctx.db,
+    dir: backupDirectory(),
+    photosDir: paths.photos,
+    label: 'pre-import',
+    clock,
+  });
+  applyImport(ctx, file, paths.photos);
+  seedDatabase(ctx);
+  invalidateSearch();
+  reloadEverything();
+}
+
+function reloadEverything(): void {
+  setImmediate(() => {
+    const ok = ctx ? true : openData();
+    showWindow(ok ? '/' : '/recovery');
+    quick.window()?.reload();
+  });
 }
 
 function applyTheme(theme: GeneralSettings['theme']): void {
@@ -254,6 +323,20 @@ function openData(): boolean {
     ...gameHandlers(context),
     ...planningHandlers(context),
     ...systemHandlers(),
+    ...dataHandlers({
+      ctx: context,
+      photosDir: dataPaths().photos,
+      backupDir: backupDirectory,
+      defaultBackupDir: dataPaths().defaultBackups,
+      setBackupDir: (dir) => {
+        writeBackupDirectory(dataPaths().userData, dir);
+        runDailyBackup();
+      },
+      lastBackupError: () => lastBackupError,
+      window: () => mainWindow,
+      restore: restoreFromBackup,
+      importFile: importExport,
+    }),
     'weighIns.upsert': (input) => {
       const result = core['weighIns.upsert']?.(input);
       for (const milestone of checkPhysiqueMilestones(context))
@@ -269,6 +352,10 @@ function openData(): boolean {
   });
   applyTheme(getSettings(context, 'general').theme);
   applySystemSettings();
+  invalidateSearch();
+  runDailyBackup();
+  clearInterval(backupTimer);
+  backupTimer = setInterval(runDailyBackup, 30 * 60_000);
   return true;
 }
 
@@ -318,6 +405,7 @@ void app.whenReady().then(() => {
   notifier = startNotifier(() => ctx, openMain);
   onDataChanged((domains) => {
     if (domains.includes('game')) tray.refresh();
+    invalidateSearch();
   });
   // Create the quick-log window in the background once the main window has loaded.
   if (ok) setTimeout(quick.preload, 2500);
@@ -339,6 +427,7 @@ app.on('window-all-closed', () => {
 });
 
 app.on('will-quit', () => {
+  clearInterval(backupTimer);
   globalShortcut.unregisterAll();
   notifier?.stop();
   tray.hide();

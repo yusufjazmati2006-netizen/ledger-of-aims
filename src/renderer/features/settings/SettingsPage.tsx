@@ -14,6 +14,7 @@ import { QuranSettingsSection } from './QuranSettings';
 import { PhysiqueSettingsSection } from './PhysiqueSettings';
 import { DegreeSettingsSection, PlannerSettingsSection } from './DegreePlannerSettings';
 import { GameSettingsSection } from './GameSettings';
+import { BackupSettingsSection, ExportSettingsSection } from './BackupSettings';
 import { NotificationSettingsSection, SystemSettingsSection } from './NotificationSettings';
 
 function SettingsSection({
@@ -179,6 +180,22 @@ export function SettingsPage() {
           description="Used by the planner and the Today screen. A night shift may end after midnight."
         >
           <ShiftEditor />
+        </SettingsSection>
+
+        <SettingsSection
+          id="backups"
+          title="Backups"
+          description="Daily, automatic and local. Restoring always keeps a copy of what it replaces."
+        >
+          <BackupSettingsSection />
+        </SettingsSection>
+
+        <SettingsSection
+          id="export"
+          title="Export & import"
+          description="Your data in open formats: JSON for everything, .ics for calendars."
+        >
+          <ExportSettingsSection />
         </SettingsSection>
 
         <SettingsSection id="privacy" title="Data & privacy">

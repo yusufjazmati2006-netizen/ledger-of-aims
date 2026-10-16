@@ -56,6 +56,8 @@ export const PALETTE_ENTRIES: readonly PaletteEntry[] = [
   go('Habits', '/review/habits', 'check', 'streaks'),
   go('Milestones', '/milestones', 'flag', 'targets'),
   go('Settings', '/settings', 'settings', 'preferences notifications shortcut'),
+  go('Search', '/search', 'search', 'find notes'),
+  go('Backups', '/settings', 'download', 'restore export import calendar ics'),
   log('Log weight', 'w ', 'dumbbell', 'weigh in'),
   log('Learn new pages', 'p ', 'book', 'quran memorise'),
   log('Rate revised pages', 'r ', 'book', 'quran review solid shaky forgotten'),

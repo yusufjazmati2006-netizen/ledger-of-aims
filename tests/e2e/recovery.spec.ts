@@ -41,7 +41,12 @@ test('a corrupted database can be restored from the newest backup', async () => 
     second.page.getByRole('heading', { name: 'Your ledger needs attention' }),
   ).toBeVisible();
   await expect(second.page.getByText('ledger-daily-2026-10-15.sqlite')).toBeVisible();
-  await second.page.getByRole('button', { name: 'Restore' }).click();
+  // The app's own daily backup (made at first launch, before onboarding) is listed too.
+  await second.page
+    .getByRole('listitem')
+    .filter({ hasText: 'ledger-daily-2026-10-15.sqlite' })
+    .getByRole('button', { name: 'Restore' })
+    .click();
   await expect(second.page.getByRole('heading', { name: '15 October' })).toBeVisible();
   await expect(second.page.getByText('70.2 kg', { exact: true })).toBeVisible();
   await second.app.close();
