@@ -38,10 +38,19 @@ export async function launchApp(
       LEDGER_USER_DATA: userData,
       LEDGER_BACKUP_DIR: backups,
       LEDGER_NOW: options.now ?? '2026-10-15T09:00:00',
+      // Reminders are checked on demand, and the quick-log window stays open when an
+      // unfocused virtual display would otherwise hide it.
+      LEDGER_NOTIFY_MANUAL: '1',
+      LEDGER_KEEP_QUICK_OPEN: '1',
       ...options.env,
     },
   });
-  const page = await app.firstWindow();
+  // The main window, not the quick-log window the app also creates.
+  let page = app.windows().find((w) => !w.url().includes('#/quick'));
+  while (!page) {
+    const next = await app.waitForEvent('window');
+    if (!next.url().includes('#/quick')) page = next;
+  }
   await page.waitForLoadState('domcontentloaded');
   return { app, page, userData, backups };
 }

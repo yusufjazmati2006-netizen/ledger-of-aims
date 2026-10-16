@@ -4,6 +4,7 @@ import { NAV_ITEMS, SETTINGS_PATH, type NavItem } from '@shared/nav';
 import { Icon, type IconName } from '../design/icons';
 import { cx } from '../lib/cx';
 import { useLedger } from '../lib/useLedger';
+import { CommandPalette } from '../features/palette/CommandPalette';
 
 const NAV_ICONS: Record<string, IconName> = {
   '/': 'today',
@@ -117,6 +118,7 @@ export function Shell() {
         <div className="mx-auto max-w-[1120px] px-12 pb-20">
           <Outlet />
         </div>
+        <CommandPalette />
       </main>
     </div>
   );

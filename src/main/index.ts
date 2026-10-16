@@ -1,4 +1,12 @@
-import { app, BrowserWindow, nativeTheme, session, shell } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  globalShortcut,
+  nativeTheme,
+  Notification,
+  session,
+  shell,
+} from 'electron';
 import type { AppInfo, RecoveryInfo } from '@shared/ipc/contract';
 import type { GeneralSettings } from '@shared/schemas/settings';
 import { createClock } from './clock';
@@ -14,7 +22,7 @@ import { planningHandlers } from './ipc/handlers/planning';
 import { checkPhysiqueMilestones } from './services/milestoneEngine';
 import { handlePhotoProtocol, registerPhotoScheme } from './photo-protocol';
 import { resolvePhotoFile } from './services/photos';
-import { broadcast, setHandlers } from './ipc/register';
+import { broadcast, onDataChanged, sendTo, setHandlers } from './ipc/register';
 import type { PartialHandlerTable } from './ipc/types';
 import { buildAppMenu } from './menu';
 import { installNetworkGuard, type NetworkGuard } from './network-guard';
@@ -27,6 +35,10 @@ import {
 } from './services/database';
 import { listBackupFiles } from './services/backupFiles';
 import { createMainWindow, loadRenderer } from './window';
+import { createQuickLog } from './quickWindow';
+import { createTray } from './tray';
+import { startNotifier, type Notifier } from './services/notifier';
+import { runningTimer, startTimer, stopTimer } from './db/repositories/game';
 
 // ── Before `ready` ───────────────────────────────────────────────────────────────
 app.setName('Ledger of Aims');
@@ -48,6 +60,98 @@ let ctx: RepoContext | null = null;
 let mainWindow: BrowserWindow | null = null;
 let guard: NetworkGuard | null = null;
 let recovery: RecoveryInfo | null = null;
+let notifier: Notifier | null = null;
+let shortcutRegistered = false;
+let registeredShortcut = '';
+
+const quick = createQuickLog({
+  mainVisible: () => Boolean(mainWindow && !mainWindow.isDestroyed() && mainWindow.isVisible()),
+});
+
+const tray = createTray({
+  quickLog: () => {
+    if (ctx) quick.show();
+  },
+  open: (path) => {
+    openMain(path);
+  },
+  timer: () => (ctx ? runningTimer(ctx) : null),
+  startTimer: () => {
+    if (!ctx) return;
+    startTimer(ctx, '');
+    broadcast('data:changed', { domains: ['game'] });
+    tray.refresh();
+  },
+  stopTimer: () => {
+    if (!ctx) return;
+    stopTimer(ctx, { note: '', focus: false });
+    broadcast('data:changed', { domains: ['game'] });
+    tray.refresh();
+  },
+  shortcut: () => (shortcutRegistered ? registeredShortcut : ''),
+  now: () => clock.now(),
+});
+
+/** Shows the main window at `path`, navigating in place if it is already open. */
+function openMain(path: string): void {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    sendTo(mainWindow, 'navigate', { path });
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.show();
+    mainWindow.focus();
+    return;
+  }
+  showWindow(ctx ? path : '/recovery');
+}
+
+/** Registers the global quick-log shortcut; false if another app already holds it. */
+function applySystemSettings(): void {
+  if (!ctx) return;
+  const system = getSettings(ctx, 'system');
+  if (system.quickLogShortcut !== registeredShortcut || !shortcutRegistered) {
+    if (registeredShortcut) globalShortcut.unregister(registeredShortcut);
+    registeredShortcut = system.quickLogShortcut;
+    shortcutRegistered = false;
+    if (registeredShortcut) {
+      try {
+        shortcutRegistered = globalShortcut.register(registeredShortcut, () => {
+          quick.toggle();
+        });
+      } catch (error) {
+        console.warn('[shortcut] invalid accelerator:', registeredShortcut, error);
+      }
+    }
+  }
+  if (system.menuBar && !process.env.LEDGER_NO_TRAY) tray.show();
+  else tray.hide();
+  tray.refresh();
+}
+
+function systemHandlers(): PartialHandlerTable {
+  return {
+    'app.openMain': ({ path }) => {
+      openMain(path);
+      quick.hide();
+      return null;
+    },
+    'quick.open': () => {
+      quick.show();
+      return null;
+    },
+    'quick.hide': () => {
+      quick.hide();
+      return null;
+    },
+    'system.status': () => ({
+      shortcut: registeredShortcut,
+      shortcutRegistered,
+      menuBar: tray.isShown(),
+      notificationsSupported: Notification.isSupported(),
+    }),
+    'notifications.runNow': () => notifier?.tick() ?? [],
+    'notifications.test': () => ({ supported: notifier?.test() ?? false }),
+  };
+}
 
 function appInfo(): AppInfo {
   const paths = dataPaths();
@@ -149,6 +253,7 @@ function openData(): boolean {
     ...degreeHandlers(context),
     ...gameHandlers(context),
     ...planningHandlers(context),
+    ...systemHandlers(),
     'weighIns.upsert': (input) => {
       const result = core['weighIns.upsert']?.(input);
       for (const milestone of checkPhysiqueMilestones(context))
@@ -158,10 +263,12 @@ function openData(): boolean {
     'settings.update': (input) => {
       const result = core['settings.update']?.(input);
       applyTheme(getSettings(context, 'general').theme);
+      applySystemSettings();
       return result as ReturnType<NonNullable<(typeof core)['settings.update']>>;
     },
   });
   applyTheme(getSettings(context, 'general').theme);
+  applySystemSettings();
   return true;
 }
 
@@ -197,8 +304,23 @@ void app.whenReady().then(() => {
     ctx ? resolvePhotoFile(ctx, dataPaths().photos, id, variant) : null,
   );
   const ok = openData();
-  buildAppMenu({ dataPath: dataPaths().userData, devTools: !app.isPackaged });
+  buildAppMenu({
+    dataPath: dataPaths().userData,
+    devTools: !app.isPackaged,
+    palette: () => {
+      if (mainWindow && !mainWindow.isDestroyed()) sendTo(mainWindow, 'command', { id: 'palette' });
+    },
+    quickLog: () => {
+      if (ctx) quick.show();
+    },
+  });
   showWindow(ok ? '/' : '/recovery');
+  notifier = startNotifier(() => ctx, openMain);
+  onDataChanged((domains) => {
+    if (domains.includes('game')) tray.refresh();
+  });
+  // Create the quick-log window in the background once the main window has loaded.
+  if (ok) setTimeout(quick.preload, 2500);
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) showWindow(ctx ? '/' : '/recovery');
@@ -217,6 +339,9 @@ app.on('window-all-closed', () => {
 });
 
 app.on('will-quit', () => {
+  globalShortcut.unregisterAll();
+  notifier?.stop();
+  tray.hide();
   ctx?.db.close();
   ctx = null;
 });

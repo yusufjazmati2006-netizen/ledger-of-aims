@@ -28,6 +28,7 @@ import { DegreeOverview } from '../features/degree/DegreeOverview';
 import { ModulesPage } from '../features/degree/ModulesPage';
 import { CalendarPage } from '../features/degree/CalendarPage';
 import { StudyPage } from '../features/degree/StudyPage';
+import { QuickLogWindow } from '../features/palette/QuickLogWindow';
 import { GamePage } from '../features/game/GamePage';
 import { RoadmapPage } from '../features/game/RoadmapPage';
 import { LearningPage } from '../features/game/LearningPage';
@@ -107,6 +108,10 @@ const router = createHashRouter([
   },
 ]);
 
+/** The same renderer serves the floating quick-log window, at #/quick. */
+const isQuickWindow = window.location.hash.startsWith('#/quick');
+if (isQuickWindow) document.documentElement.dataset.window = 'quick';
+
 export function App() {
   const status = useApp((s) => s.status);
   const error = useApp((s) => s.error);
@@ -166,7 +171,8 @@ export function App() {
       </div>
     );
   }
-  if (status === 'recovery') return <RecoveryScreen />;
+  if (status === 'recovery') return isQuickWindow ? null : <RecoveryScreen />;
+  if (isQuickWindow) return <QuickLogWindow onboarded={onboarded} />;
 
   return (
     <>

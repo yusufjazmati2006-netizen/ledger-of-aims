@@ -87,6 +87,7 @@ import {
 } from '../schemas/game';
 import type { Dependency } from '../domain/game/roadmap';
 import { settingsSchemas, type SettingsMap } from '../schemas/settings';
+import type { PendingNotification } from '../domain/notifications/schedule';
 import {
   habitInputSchema,
   reviewInputSchema,
@@ -174,14 +175,43 @@ const settingsUpdateSchema = z.discriminatedUnion('namespace', [
   z.object({ namespace: z.literal('degree'), patch: patchSchema(settingsSchemas.degree) }),
   z.object({ namespace: z.literal('game'), patch: patchSchema(settingsSchemas.game) }),
   z.object({ namespace: z.literal('planner'), patch: patchSchema(settingsSchemas.planner) }),
+  z.object({
+    namespace: z.literal('notifications'),
+    patch: patchSchema(settingsSchemas.notifications),
+  }),
+  z.object({ namespace: z.literal('system'), patch: patchSchema(settingsSchemas.system) }),
   z.object({ namespace: z.literal('window'), patch: patchSchema(settingsSchemas.window) }),
 ]);
+
+export interface SystemStatus {
+  shortcut: string;
+  /** False when another app already uses the shortcut. */
+  shortcutRegistered: boolean;
+  menuBar: boolean;
+  notificationsSupported: boolean;
+}
 
 export const contract = {
   // App & diagnostics
   'app.bootstrap': { input: z.void(), output: out<Bootstrap>() },
   'app.today': { input: z.void(), output: out<{ today: string; nowIso: string }>() },
   'app.revealDataFolder': { input: z.void(), output: out<null>() },
+  /** Shows the main window at a path (used by the quick-log window). */
+  'app.openMain': {
+    input: z.object({
+      path: z
+        .string()
+        .regex(/^\/[\w/-]*$/)
+        .max(100),
+    }),
+    output: out<null>(),
+  },
+  'quick.open': { input: z.void(), output: out<null>() },
+  'quick.hide': { input: z.void(), output: out<null>() },
+  'system.status': { input: z.void(), output: out<SystemStatus>() },
+  /** Runs the reminder check now and returns what was sent. */
+  'notifications.runNow': { input: z.void(), output: out<PendingNotification[]>() },
+  'notifications.test': { input: z.void(), output: out<{ supported: boolean }>() },
   'diagnostics.networkLog': {
     input: z.void(),
     output: out<{ blocked: { url: string; at: string }[] }>(),
@@ -639,5 +669,7 @@ export interface EventPayloads {
   navigate: { path: string };
   command: { id: 'quick-log' | 'palette' | 'export' | 'import' | 'backup-now' };
   'milestone:completed': { milestone: Milestone };
+  /** The quick-log window was shown: clear and focus the input. */
+  'quick:shown': Record<string, never>;
 }
 export type EventName = keyof EventPayloads;

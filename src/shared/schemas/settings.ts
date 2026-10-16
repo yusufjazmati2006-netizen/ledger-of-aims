@@ -147,6 +147,52 @@ export const plannerSettingsSchema = z.object({
 });
 export type PlannerSettings = z.infer<typeof plannerSettingsSchema>;
 
+const clock = (fallback: string) =>
+  z
+    .string()
+    .regex(/^([01]\d|2[0-3]):[0-5]\d$/)
+    .default(fallback);
+const reminder = (time: string) =>
+  z
+    .object({ enabled: z.boolean().default(true), time: clock(time) })
+    .default({ enabled: true, time });
+
+/** Native notifications: each kind on its own switch, all held in quiet hours. */
+export const notificationSettingsSchema = z.object({
+  enabled: z.boolean().default(true),
+  quietStart: clock('22:30'),
+  quietEnd: clock('07:00'),
+  /** Hold reminders during shifts (with commute) and the planner's sleep window. */
+  respectShifts: z.boolean().default(true),
+  revision: reminder('08:00'),
+  weighIn: reminder('07:30'),
+  training: reminder('17:30'),
+  deadlines: z
+    .object({
+      enabled: z.boolean().default(true),
+      time: clock('09:00'),
+      daysBefore: z.array(z.number().int().min(0).max(60)).max(6).default([7, 3, 1, 0]),
+    })
+    .default({ enabled: true, time: '09:00', daysBefore: [7, 3, 1, 0] }),
+  weeklyReview: reminder('19:00'),
+  planBlocks: z
+    .object({
+      enabled: z.boolean().default(true),
+      leadMinutes: z.number().int().min(0).max(120).default(10),
+    })
+    .default({ enabled: true, leadMinutes: 10 }),
+  longTimer: z.object({ enabled: z.boolean().default(true) }).default({ enabled: true }),
+});
+export type NotificationSettings = z.infer<typeof notificationSettingsSchema>;
+
+/** Integration with the system: the global quick-log shortcut and the menu-bar item. */
+export const systemSettingsSchema = z.object({
+  /** An Electron accelerator; empty disables the shortcut. */
+  quickLogShortcut: z.string().max(60).default('Control+Shift+Space'),
+  menuBar: z.boolean().default(true),
+});
+export type SystemSettings = z.infer<typeof systemSettingsSchema>;
+
 export const windowSettingsSchema = z.object({
   bounds: z
     .object({
@@ -170,6 +216,8 @@ export const settingsSchemas = {
   degree: degreeSettingsSchema,
   game: gameSettingsSchema,
   planner: plannerSettingsSchema,
+  notifications: notificationSettingsSchema,
+  system: systemSettingsSchema,
   window: windowSettingsSchema,
 } as const;
 

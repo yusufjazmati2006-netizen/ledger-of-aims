@@ -6,7 +6,7 @@ physique — planned around a cafe shift pattern.
 
 Everything stays on your Mac. No accounts, no cloud, no telemetry, no network.
 
-> **Status:** Phases 1–6 of 9 are complete (foundations; Quran; Physique; Degree; Game; Today, planner and weekly review). See [CHANGELOG.md](CHANGELOG.md)
+> **Status:** Phases 1–7 of 9 are complete (foundations; Quran; Physique; Degree; Game; Today, planner and weekly review; quick log and notifications). See [CHANGELOG.md](CHANGELOG.md)
 > for what works today and [TODO.md](TODO.md) for what is still to come.
 
 ## Quick start (developers)
@@ -29,6 +29,27 @@ Other scripts:
 | `npm run contrast` | Verify every colour pairing meets WCAG AA.                                    |
 | `npm run icons`    | Regenerate the app and menu-bar icons from `build/*.svg`.                     |
 | `npm run dist`     | Build the universal (Apple silicon + Intel) `.dmg` and `.app` (run on a Mac). |
+
+## Logging in a few seconds
+
+Press **Ctrl+Shift+Space** from any app (change it in Settings → Menu bar & shortcut), or
+**⌘K** inside the app, type a line and press Return:
+
+| Type           | Logs                                                        |
+| -------------- | ----------------------------------------------------------- |
+| `w 72.4`       | today's weight (your display unit, or add `kg` / `lb`)      |
+| `p 3`          | the next 3 pages in your memorisation order                 |
+| `p 322-324`    | those pages as learned                                      |
+| `r 1-20 solid` | a revision rating (`solid`, `shaky`, `forgotten`) for pages |
+| `r j17 shaky`  | a rating for a whole juz                                    |
+| `s 1.5h essay` | study time, with an optional note                           |
+| `g 45m`        | game time; `g start` / `g stop` run the timer               |
+| `wo`           | opens today's workout                                       |
+| `h phone`      | ticks the habit whose name contains "phone"                 |
+
+Durations accept `45m`, `1.5h`, `1h30` and `1:30`; a bare number under 10 means hours.
+Typing words instead jumps to a screen ("plan", "nutrition", "steam"…). The menu-bar item
+offers the same quick log and starts or stops the game timer, showing its running time.
 
 ## Where your data lives
 

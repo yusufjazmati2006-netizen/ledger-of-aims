@@ -1,29 +1,10 @@
 import { useMemo } from 'react';
-import { spanOf, toMinutes } from '@shared/domain/time/clockTime';
+import { spanOf } from '@shared/domain/time/clockTime';
+import { plannerRules } from '@shared/domain/planner/rules';
 import { addDays, type LocalDate } from '@shared/domain/time/localDate';
-import {
-  weekFrames,
-  type DayFrame,
-  type PlannerRules,
-  type ShiftSpan,
-} from '@shared/domain/planner/freeTime';
-import type { PlannerSettings } from '@shared/schemas/settings';
+import { weekFrames, type DayFrame, type ShiftSpan } from '@shared/domain/planner/freeTime';
 import { useSettings } from '../../stores/app';
 import { useLedger } from '../../lib/useLedger';
-
-export function plannerRules(p: PlannerSettings): PlannerRules {
-  return {
-    commuteMinutes: p.commuteMinutes,
-    sleepMinutes: Math.round(p.sleepHours * 60),
-    windDownMinutes: p.windDownMinutes,
-    morningRoutineMinutes: p.morningRoutineMinutes,
-    postShiftRecoveryMinutes: p.postShiftRecoveryMinutes,
-    dayStart: toMinutes(p.dayStart),
-    dayEnd: toMinutes(p.dayEnd),
-    minWindowMinutes: p.minWindowMinutes,
-    minSleepBetweenShifts: Math.round(p.minSleepBetweenShiftsHours * 60),
-  };
-}
 
 /**
  * Shift-aware day frames (free windows, wake/bed times, clopen warnings) for `days`

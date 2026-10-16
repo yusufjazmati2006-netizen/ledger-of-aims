@@ -9,11 +9,21 @@ Known gaps and follow-ups. Phases refer to the plan in the README.
 - [x] Phase 4 — Degree module.
 - [x] Phase 5 — Game module.
 - [x] Phase 6 — Today actions, shift-aware planner, weekly review.
-- [ ] Phase 7 — Tray, global shortcut, command palettes, notifications.
+- [x] Phase 7 — Tray, global shortcut, command palettes, notifications.
 - [ ] Phase 8 — Backups, JSON import/export, `.ics` export, search.
 - [ ] Phase 9 — Packaging (`npm run dist`), macOS CI, README, full E2E, a11y/perf.
 
 ## Known gaps
+
+- Notifications only appear while the app is running; there is no launch-at-login
+  option yet (macOS can add it under System Settings → General → Login Items).
+- The menu-bar icon, vibrancy of the floating window and notification banners need a
+  first look on a real Mac (development is on Linux, where they are exercised but not
+  seen).
+- Quick log cannot yet log food (`f oats`) or a workout set (`bench 60x8`); both need a
+  fuzzy match against your favourites and exercises.
+- Search in the palette covers screens and actions; searching your own notes and
+  entries arrives with Phase 8.
 
 - Planner: blocks cannot cross midnight, and resizing is done in the edit dialog rather
   than by dragging an edge.
@@ -24,8 +34,6 @@ Known gaps and follow-ups. Phases refer to the plan in the README.
   scored yet.
 - Habits are daily only; “three times a week” habits would need a weekly target.
 
-- Game: the timer cannot be started from outside the Game screen yet; the tray, global
-  shortcut and palettes (Phase 7) will offer start/stop and `g 45m`.
 - Game: a devlog "insert this week's summary" (hours, finished tasks) would save typing.
 - Game: roadmap tasks are reordered only by editing; drag-to-reorder could follow.
 - Degree: discounting rules (e.g. "best 100 of 120 credits"), borderline/rounding

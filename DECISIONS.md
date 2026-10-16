@@ -172,6 +172,30 @@ reasoning. Anything here can be revisited; most are editable defaults in the app
   seven). “At risk” means missing today would end the streak, so with grace left a
   habit is not at risk.
 
+## Quick log, menu bar and notifications
+
+- **One grammar** for the palette, the floating window and (later) anything else, so
+  there is one thing to learn. The first word picks the command; anything else is a
+  search. A bare duration under 10 means hours in quick logs (`s 2` is two hours),
+  because a two-minute study session is never what was meant.
+- **`p N` counts, `p a-b` names pages**; `p 322` alone is refused rather than guessed.
+  Ratings accept `solid/good/ok`, `shaky/weak` and `forgotten/forgot/lost`, and only
+  learned pages in a range are rated.
+- **Default shortcut Ctrl+Shift+Space** (as planned): it avoids Spotlight (⌘Space),
+  input-source switching (⌃Space) and VoiceOver (⌃⌥). If another app holds it, Settings
+  says so instead of failing silently.
+- **The floating window** is created once in the background and reused, so it appears
+  instantly; it hides on blur and returns focus to the previous app.
+- **Notifications are in-app, not OS-scheduled**: they appear only while Ledger of Aims
+  is running (it can live in the menu bar). This keeps everything local and avoids
+  stale scheduled alerts after plans change. Each reminder has a key (e.g.
+  `revision:2026-10-15`) recorded when sent, so restarts never repeat one; at most two
+  are shown per minute.
+- **Holding** rather than dropping: a reminder that falls in a shift, the sleep window
+  or quiet hours goes out at the first moment it is allowed that day, if still relevant.
+  Plan-block reminders and the forgotten-timer alert ignore the shift hold (you asked
+  for the block), but not quiet hours.
+
 ## Planner rules
 
 - Default sleep 8 h, wind-down 30 min, morning routine 30 min, commute 20 min each way,
@@ -202,8 +226,6 @@ reasoning. Anything here can be revisited; most are editable defaults in the app
   D Physique.
 - Goal accents: Quran — deep teal; Physique — ochre; Degree — oxblood; Game —
   indigo. All text pairings meet WCAG AA in both themes (`npm run contrast`).
-- Global quick-log shortcut default (Phase 7): **Ctrl+Shift+Space**, chosen to avoid
-  Spotlight, VoiceOver (Ctrl+Option) and Finder conflicts.
 
 ## Pending your confirmation
 

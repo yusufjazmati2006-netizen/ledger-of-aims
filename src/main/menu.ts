@@ -5,7 +5,12 @@ import { broadcast } from './ipc/register';
 const isMac = process.platform === 'darwin';
 
 /** The standard macOS menu bar, with ⌘1–⌘9 jumping between sections. */
-export function buildAppMenu(options: { dataPath: string; devTools: boolean }): void {
+export function buildAppMenu(options: {
+  dataPath: string;
+  devTools: boolean;
+  palette: () => void;
+  quickLog: () => void;
+}): void {
   const navigate = (path: string) => () => {
     broadcast('navigate', { path });
   };
@@ -51,11 +56,16 @@ export function buildAppMenu(options: { dataPath: string; devTools: boolean }): 
     { role: 'editMenu' },
     {
       label: 'Go',
-      submenu: NAV_ITEMS.map((item, index) => ({
-        label: item.label,
-        accelerator: index < 9 ? `CmdOrCtrl+${index + 1}` : undefined,
-        click: navigate(item.path),
-      })),
+      submenu: [
+        { label: 'Command Palette…', accelerator: 'CmdOrCtrl+K', click: options.palette },
+        { label: 'Quick Log…', click: options.quickLog },
+        { type: 'separator' },
+        ...NAV_ITEMS.map((item, index) => ({
+          label: item.label,
+          accelerator: index < 9 ? `CmdOrCtrl+${index + 1}` : undefined,
+          click: navigate(item.path),
+        })),
+      ],
     },
     {
       label: 'View',

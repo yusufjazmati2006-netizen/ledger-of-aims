@@ -2,6 +2,40 @@
 
 All notable changes, by phase.
 
+## [0.7.0] — Phase 7: Quick log, menu bar and notifications
+
+### Added
+
+- **Quick-log grammar** shared by every entry point: `w 72.4`, `p 3`, `p 322-324`,
+  `r 1-20 solid`, `r j17 shaky`, `s 1.5h essay`, `g 45m`, `g start` / `g stop`, `wo`,
+  `h phone`. Each line is previewed before you press Return (“Log 70.2 kg as today’s
+  weight”), incomplete lines explain what is missing, and lines that cannot run say
+  why (“None of those pages are learned yet”).
+- **⌘K command palette** in the main window (also Go → Command Palette…): the grammar
+  plus search across every screen and sub-screen, with full keyboard control.
+- **Global quick-log window**: Ctrl+Shift+Space from any app opens a small floating
+  palette; log, see it confirmed, and it hides itself. Escape or clicking away
+  dismisses it.
+- **Menu-bar item** (template icon): quick log, start/stop the game timer with its
+  running time shown beside the icon, and shortcuts to Today, Planner and Weekly
+  review.
+- **Notifications** for due revision, the weigh-in, training days, degree deadlines
+  (7, 3, 1 and 0 days before by default), the weekly review, planned blocks (10
+  minutes before) and a forgotten game timer. Each is sent once, only if still
+  relevant, never in quiet hours (22:30–07:00 by default), and — unless switched off
+  — held during shifts and the sleep window after a night shift until you are up.
+  Clicking one opens the right screen.
+- Settings → Notifications (every reminder on its own switch and time, quiet hours, a
+  test button) and Settings → Menu bar & shortcut (a shortcut recorder that reports
+  when another app already uses the combination).
+- Migration `007_notifications` (a log of sent reminders, pruned after 60 days).
+
+### Tests
+
+- 284 unit tests (grammar, reminder rules and holds, state gathering, palette search,
+  shortcut recording) and 15 end-to-end flows, including the floating window, ⌘K and
+  notifications held after a night shift.
+
 ## [0.6.0] — Phase 6: Today, planner, weekly review
 
 ### Added

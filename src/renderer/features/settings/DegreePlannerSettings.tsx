@@ -99,7 +99,7 @@ export function DegreeSettingsSection() {
   );
 }
 
-function TimeField({
+export function TimeField({
   id,
   label,
   value,

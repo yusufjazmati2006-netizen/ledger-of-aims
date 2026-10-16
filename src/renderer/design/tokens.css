@@ -381,3 +381,11 @@
 .markdown img {
   display: none;
 }
+
+/* The floating quick-log window: on macOS the window itself is translucent. */
+:root[data-window='quick'] body {
+  background: transparent;
+}
+:root[data-window='quick'][data-platform='darwin'] .bg-surface {
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+}

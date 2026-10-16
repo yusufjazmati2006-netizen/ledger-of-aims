@@ -14,6 +14,7 @@ import { QuranSettingsSection } from './QuranSettings';
 import { PhysiqueSettingsSection } from './PhysiqueSettings';
 import { DegreeSettingsSection, PlannerSettingsSection } from './DegreePlannerSettings';
 import { GameSettingsSection } from './GameSettings';
+import { NotificationSettingsSection, SystemSettingsSection } from './NotificationSettings';
 
 function SettingsSection({
   id,
@@ -154,6 +155,22 @@ export function SettingsPage() {
           description="The rules that keep plans realistic around your shifts and sleep."
         >
           <PlannerSettingsSection />
+        </SettingsSection>
+
+        <SettingsSection
+          id="notifications"
+          title="Notifications"
+          description="Reminders that respect quiet hours, your shifts and your sleep."
+        >
+          <NotificationSettingsSection />
+        </SettingsSection>
+
+        <SettingsSection
+          id="system"
+          title="Menu bar & shortcut"
+          description="Log from anywhere in a few seconds."
+        >
+          <SystemSettingsSection />
         </SettingsSection>
 
         <SettingsSection
