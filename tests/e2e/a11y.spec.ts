@@ -47,8 +47,16 @@ interface AxeViolation {
 }
 
 async function audit(page: Page, label: string): Promise<string[]> {
-  // Let entrance animations finish so colours are measured at rest.
-  await page.waitForTimeout(350);
+  // Let entrance animations finish so colours are measured at rest (a fixed pause
+  // is not enough on a slow CI machine). Endless ones, such as spinners, are skipped.
+  await page.evaluate(() =>
+    Promise.all(
+      document
+        .getAnimations()
+        .filter((a) => a.effect?.getComputedTiming().iterations !== Infinity)
+        .map((a) => a.finished.catch(() => undefined)),
+    ),
+  );
   const loaded = await page.evaluate(() => 'axe' in window);
   if (!loaded) await page.evaluate(AXE);
   const violations = await page.evaluate(async () => {
