@@ -219,6 +219,25 @@ reasoning. Anything here can be revisited; most are editable defaults in the app
   without the marks). The index is rebuilt whole when data has changed since the last search
   — milliseconds at this scale, and it cannot drift out of step with the data.
 
+## Shipping
+
+- **Version 0.9.0, not 1.0.0**: everything is built and tested on Linux, but the
+  universal Mac build has not yet run. 1.0.0 should follow the first successful run of
+  the macOS workflow and a look at the app on your Mac.
+- **The Mac build happens on GitHub's macOS runners** (universal `.dmg` creation needs
+  `lipo` and `hdiutil`), and the same workflow runs the end-to-end suite on macOS, so
+  macOS-only code paths (vibrancy, the template menu-bar icon) are exercised there.
+- **Unsigned** by design (no developer account). The README explains the one-time
+  right-click → Open.
+- **Code splitting by feature**: the shell and Today load at start; each goal's screens
+  are one chunk loaded on first visit (from disk, so instantly).
+- **Theme**: the setting drives both `nativeTheme` (vibrancy, title bar) and a
+  `data-theme` attribute the CSS follows; “System” uses `prefers-color-scheme`.
+- **Accessibility target**: WCAG 2.2 AA, checked by axe on every screen in both themes;
+  small controls are sized in pixels because the interface's base font is 14 px.
+- **Login item** only for the installed app on macOS — a development build would
+  register Electron itself.
+
 ## Planner rules
 
 - Default sleep 8 h, wind-down 30 min, morning routine 30 min, commute 20 min each way,

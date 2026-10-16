@@ -263,6 +263,14 @@ export function SystemSettingsSection() {
         label="Show in the menu bar"
         description="Quick log, the game timer (with its running time) and shortcuts into the app."
       />
+      {status.data?.openAtLoginSupported ? (
+        <Switch
+          checked={system.openAtLogin}
+          onChange={(openAtLogin) => void save({ openAtLogin })}
+          label="Open at login"
+          description="So reminders and the daily backup happen even on days you do not open the app yourself."
+        />
+      ) : null}
     </div>
   );
 }

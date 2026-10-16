@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, type ComponentType } from 'react';
 import { createHashRouter, RouterProvider } from 'react-router';
 import { useApp } from '../stores/app';
 import { Toaster } from '../design/Toaster';
@@ -9,39 +9,21 @@ import { Shell } from './Shell';
 import { RecoveryScreen } from '../features/recovery/RecoveryScreen';
 import { Onboarding } from '../features/onboarding/Onboarding';
 import { TodayPage } from '../features/today/TodayPage';
-import { MilestonesPage } from '../features/milestones/MilestonesPage';
-import { SettingsPage } from '../features/settings/SettingsPage';
 import { NotFound } from './NotFound';
-import { QuranPage } from '../features/quran/QuranPage';
-import { QuranOverview } from '../features/quran/QuranOverview';
-import { RevisionPage } from '../features/quran/RevisionPage';
-import { MushafPage } from '../features/quran/MushafPage';
-import { LearningLogPage } from '../features/quran/LearningLogPage';
-import { PhysiquePage } from '../features/physique/PhysiquePage';
-import { WeightPage } from '../features/physique/WeightPage';
-import { TrainingPage } from '../features/physique/TrainingPage';
-import { NutritionPage } from '../features/physique/NutritionPage';
-import { MealPrepPage } from '../features/physique/MealPrepPage';
-import { PhotosPage } from '../features/physique/PhotosPage';
-import { DegreePage } from '../features/degree/DegreePage';
-import { DegreeOverview } from '../features/degree/DegreeOverview';
-import { ModulesPage } from '../features/degree/ModulesPage';
-import { CalendarPage } from '../features/degree/CalendarPage';
-import { StudyPage } from '../features/degree/StudyPage';
 import { QuickLogWindow } from '../features/palette/QuickLogWindow';
-import { GamePage } from '../features/game/GamePage';
-import { RoadmapPage } from '../features/game/RoadmapPage';
-import { LearningPage } from '../features/game/LearningPage';
-import { PracticePage } from '../features/game/PracticePage';
-import { TimePage } from '../features/game/TimePage';
-import { DevlogPage } from '../features/game/DevlogPage';
-import { SteamPage } from '../features/game/SteamPage';
-import { PlannerPage } from '../features/planner/PlannerPage';
-import { SearchPage } from '../features/search/SearchPage';
-import { ReviewPage } from '../features/review/ReviewPage';
-import { ReviewWeekPage } from '../features/review/ReviewWeekPage';
-import { HistoryPage } from '../features/review/HistoryPage';
-import { HabitsPage } from '../features/review/HabitsPage';
+
+/**
+ * Screens load on first visit (each feature is its own chunk), so start-up parses only
+ * the shell and Today. Chunks come from local disk, so a first visit is still instant.
+ */
+function page<M>(load: () => Promise<M>, pick: (m: M) => ComponentType) {
+  return async () => ({ Component: pick(await load()) });
+}
+const quran = () => import('../features/quran/routes');
+const physique = () => import('../features/physique/routes');
+const game = () => import('../features/game/routes');
+const degree = () => import('../features/degree/routes');
+const review = () => import('../features/review/routes');
 
 const router = createHashRouter([
   {
@@ -51,60 +33,84 @@ const router = createHashRouter([
       { index: true, element: <TodayPage /> },
       {
         path: 'quran',
-        element: <QuranPage />,
+        lazy: page(quran, (m) => m.QuranPage),
         children: [
-          { index: true, element: <QuranOverview /> },
-          { path: 'revision', element: <RevisionPage /> },
-          { path: 'mushaf', element: <MushafPage /> },
-          { path: 'log', element: <LearningLogPage /> },
+          { index: true, lazy: page(quran, (m) => m.QuranOverview) },
+          { path: 'revision', lazy: page(quran, (m) => m.RevisionPage) },
+          { path: 'mushaf', lazy: page(quran, (m) => m.MushafPage) },
+          { path: 'log', lazy: page(quran, (m) => m.LearningLogPage) },
         ],
       },
       {
         path: 'physique',
-        element: <PhysiquePage />,
+        lazy: page(physique, (m) => m.PhysiquePage),
         children: [
-          { index: true, element: <WeightPage /> },
-          { path: 'training', element: <TrainingPage /> },
-          { path: 'nutrition', element: <NutritionPage /> },
-          { path: 'meal-prep', element: <MealPrepPage /> },
-          { path: 'photos', element: <PhotosPage /> },
+          { index: true, lazy: page(physique, (m) => m.WeightPage) },
+          { path: 'training', lazy: page(physique, (m) => m.TrainingPage) },
+          { path: 'nutrition', lazy: page(physique, (m) => m.NutritionPage) },
+          { path: 'meal-prep', lazy: page(physique, (m) => m.MealPrepPage) },
+          { path: 'photos', lazy: page(physique, (m) => m.PhotosPage) },
         ],
       },
       {
         path: 'game',
-        element: <GamePage />,
+        lazy: page(game, (m) => m.GamePage),
         children: [
-          { index: true, element: <RoadmapPage /> },
-          { path: 'learning', element: <LearningPage /> },
-          { path: 'practice', element: <PracticePage /> },
-          { path: 'time', element: <TimePage /> },
-          { path: 'devlog', element: <DevlogPage /> },
-          { path: 'steam', element: <SteamPage /> },
+          { index: true, lazy: page(game, (m) => m.RoadmapPage) },
+          { path: 'learning', lazy: page(game, (m) => m.LearningPage) },
+          { path: 'practice', lazy: page(game, (m) => m.PracticePage) },
+          { path: 'time', lazy: page(game, (m) => m.TimePage) },
+          { path: 'devlog', lazy: page(game, (m) => m.DevlogPage) },
+          { path: 'steam', lazy: page(game, (m) => m.SteamPage) },
         ],
       },
       {
         path: 'degree',
-        element: <DegreePage />,
+        lazy: page(degree, (m) => m.DegreePage),
         children: [
-          { index: true, element: <DegreeOverview /> },
-          { path: 'modules', element: <ModulesPage /> },
-          { path: 'calendar', element: <CalendarPage /> },
-          { path: 'study', element: <StudyPage /> },
+          { index: true, lazy: page(degree, (m) => m.DegreeOverview) },
+          { path: 'modules', lazy: page(degree, (m) => m.ModulesPage) },
+          { path: 'calendar', lazy: page(degree, (m) => m.CalendarPage) },
+          { path: 'study', lazy: page(degree, (m) => m.StudyPage) },
         ],
       },
-      { path: 'planner', element: <PlannerPage /> },
+      {
+        path: 'planner',
+        lazy: page(
+          () => import('../features/planner/PlannerPage'),
+          (m) => m.PlannerPage,
+        ),
+      },
       {
         path: 'review',
-        element: <ReviewPage />,
+        lazy: page(review, (m) => m.ReviewPage),
         children: [
-          { index: true, element: <ReviewWeekPage /> },
-          { path: 'history', element: <HistoryPage /> },
-          { path: 'habits', element: <HabitsPage /> },
+          { index: true, lazy: page(review, (m) => m.ReviewWeekPage) },
+          { path: 'history', lazy: page(review, (m) => m.HistoryPage) },
+          { path: 'habits', lazy: page(review, (m) => m.HabitsPage) },
         ],
       },
-      { path: 'milestones', element: <MilestonesPage /> },
-      { path: 'search', element: <SearchPage /> },
-      { path: 'settings', element: <SettingsPage /> },
+      {
+        path: 'milestones',
+        lazy: page(
+          () => import('../features/milestones/MilestonesPage'),
+          (m) => m.MilestonesPage,
+        ),
+      },
+      {
+        path: 'search',
+        lazy: page(
+          () => import('../features/search/SearchPage'),
+          (m) => m.SearchPage,
+        ),
+      },
+      {
+        path: 'settings',
+        lazy: page(
+          () => import('../features/settings/SettingsPage'),
+          (m) => m.SettingsPage,
+        ),
+      },
       { path: '*', element: <NotFound /> },
     ],
   },
@@ -161,6 +167,12 @@ export function App() {
   useEffect(() => {
     document.documentElement.dataset.reduceMotion = String(reduceMotion);
   }, [reduceMotion]);
+
+  const theme = useApp((s) => s.settings?.general.theme ?? 'system');
+  useEffect(() => {
+    if (theme === 'system') delete document.documentElement.dataset.theme;
+    else document.documentElement.dataset.theme = theme;
+  }, [theme]);
 
   if (status === 'loading') return <div className="h-full bg-paper" aria-busy="true" />;
   if (status === 'error') {

@@ -112,6 +112,11 @@ function openMain(path: string): void {
   showWindow(ctx ? path : '/recovery');
 }
 
+/** Only the installed Mac app registers itself; a development build would add Electron. */
+function loginItemSupported(): boolean {
+  return process.platform === 'darwin' && app.isPackaged;
+}
+
 /** Registers the global quick-log shortcut; false if another app already holds it. */
 function applySystemSettings(): void {
   if (!ctx) return;
@@ -130,6 +135,7 @@ function applySystemSettings(): void {
       }
     }
   }
+  if (loginItemSupported()) app.setLoginItemSettings({ openAtLogin: system.openAtLogin });
   if (system.menuBar && !process.env.LEDGER_NO_TRAY) tray.show();
   else tray.hide();
   tray.refresh();
@@ -155,6 +161,7 @@ function systemHandlers(): PartialHandlerTable {
       shortcutRegistered,
       menuBar: tray.isShown(),
       notificationsSupported: Notification.isSupported(),
+      openAtLoginSupported: loginItemSupported(),
     }),
     'notifications.runNow': () => notifier?.tick() ?? [],
     'notifications.test': () => ({ supported: notifier?.test() ?? false }),

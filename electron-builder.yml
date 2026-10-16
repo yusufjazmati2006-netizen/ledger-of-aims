@@ -10,10 +10,9 @@ files:
   - out/**
   - package.json
   - '!**/*.map'
-  # better-sqlite3 ships prebuilt Node-API binaries; the C sources and other
-  # platforms' binaries are not needed at runtime.
+  # better-sqlite3 ships prebuilt Node-API binaries; the C sources are not needed at
+  # runtime, and each platform below drops the other platforms' binaries.
   - '!**/node_modules/better-sqlite3/{deps,src,binding.gyp}/**'
-  - '!**/node_modules/better-sqlite3/prebuilds/{linux,linuxmusl,win32}-*.node'
 # The menu-bar icon is loaded from disk at runtime (macOS picks @2x automatically).
 extraResources:
   - from: build/trayTemplate.png
@@ -24,7 +23,11 @@ asarUnpack:
   - '**/node_modules/better-sqlite3/**'
 # Prebuilds already exist for every target, so no native rebuild is required.
 npmRebuild: false
+# No auto-update: the app never contacts a server, so no update metadata is written.
+publish: null
 mac:
+  files:
+    - '!**/node_modules/better-sqlite3/prebuilds/{linux,linuxmusl,win32}-*.node'
   category: public.app-category.productivity
   icon: build/icon.icns
   identity: null
@@ -53,7 +56,10 @@ dmg:
   window:
     width: 560
     height: 380
+# Linux is only used for packaging checks in development (`npm run dist:linux`).
 linux:
+  files:
+    - '!**/node_modules/better-sqlite3/prebuilds/{darwin,linuxmusl,win32}-*.node'
   target: dir
   icon: build/icon.png
   category: Utility

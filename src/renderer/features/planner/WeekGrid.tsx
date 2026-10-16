@@ -274,7 +274,7 @@ function DayHeader({
 }: { frame: DayFrame } & WeekGridProps) {
   const label = `${weekdayShort(frame.date)} ${formatDate(frame.date, { year: false })}`;
   return (
-    <div className={cx('mb-2 min-w-0', frame.date < today && 'opacity-60')}>
+    <div className="mb-2 min-w-0">
       <div
         className={cx(
           'text-[12.5px] font-semibold',
@@ -325,8 +325,8 @@ function DayColumn({
     <div
       data-day-column
       className={cx(
-        'relative overflow-hidden rounded-lg border border-rule bg-surface',
-        past && 'opacity-70',
+        'relative overflow-hidden rounded-lg border border-rule',
+        past ? 'bg-sunken/60' : 'bg-surface',
       )}
       style={{ height: HEIGHT }}
       role="group"

@@ -2,6 +2,52 @@
 
 All notable changes, by phase.
 
+## [0.9.0] — Phase 9: Ship
+
+### Added
+
+- **GitHub Actions**: `CI` (typecheck, lint, format, unit tests, contrast, end-to-end
+  suite under Xvfb) and `macOS app` (checks and the end-to-end suite on a Mac runner,
+  universal `.dmg` + `.zip`, a check that the app contains both architectures, a smoke
+  test of the packaged app, artifacts, and release attachment for `v*` tags).
+- **Open at login** (installed Mac app), so reminders and the daily backup run on days
+  the app is not opened by hand.
+- **Accessibility audit**: axe (WCAG 2.2 A/AA) across every screen, the command palette,
+  and both themes, as an end-to-end test.
+- **Performance budgets** as an end-to-end test (cold start to a populated Today, the
+  604-cell mushaf, the planner), and query-plan tests requiring an index for every
+  hot date-range query.
+- **Offline proof**: `npm run test:offline` runs the whole end-to-end suite with
+  networking removed, and every end-to-end test now checks the network guard's log
+  when it closes the app.
+- `npm run dist:linux` and `LEDGER_E2E_EXECUTABLE` to package the app and run the suite
+  against the packaged binary.
+- A full README: install and first launch, everyday use, shortcuts, data and backups,
+  privacy verification, development, releasing, troubleshooting.
+
+### Changed
+
+- The renderer is minified and split by screen: the start-up bundle fell from 3.2 MB
+  (unminified, one chunk) to 0.49 MB; charts and the markdown devlog load on first use.
+- Migration `009_indexes` adds the one missing date index (meal-prep sessions).
+
+### Fixed
+
+- **Dark theme did not apply on platforms where Electron's theme choice does not reach
+  `prefers-color-scheme`**; the chosen theme is now also set on the document, which
+  the colour tokens follow.
+- Accessibility (found by the audit): the mushaf grid's ARIA structure; charts hidden
+  from assistive technology while still focusable; buttons whose accessible name did
+  not include their visible text; click targets under 24 px; past days in the planner
+  faded below contrast.
+- Packaging: each platform now keeps its own SQLite binaries (a Linux package had kept
+  only the macOS ones), and no auto-update metadata is written.
+
+### Tests
+
+- 313 unit tests and 21 end-to-end flows, passing both normally and with networking
+  removed; 10 of the flows also pass against the packaged Linux build.
+
 ## [0.8.0] — Phase 8: Backups, export and search
 
 ### Added

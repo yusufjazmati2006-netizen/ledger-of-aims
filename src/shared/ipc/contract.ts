@@ -198,6 +198,8 @@ export interface SystemStatus {
   shortcutRegistered: boolean;
   menuBar: boolean;
   notificationsSupported: boolean;
+  /** Login items are set for the installed macOS app only. */
+  openAtLoginSupported: boolean;
 }
 
 export const contract = {

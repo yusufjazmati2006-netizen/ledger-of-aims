@@ -73,7 +73,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
         tone === 'danger'
           ? 'text-ink-faint hover:bg-critical-soft hover:text-critical'
           : 'text-ink-faint hover:bg-sunken hover:text-ink',
-        size === 'sm' ? 'h-6 w-6' : 'h-8 w-8',
+        size === 'sm' ? 'h-[26px] w-[26px]' : 'h-8 w-8',
         className,
       )}
       {...rest}

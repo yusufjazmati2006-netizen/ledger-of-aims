@@ -43,8 +43,9 @@ export function NextActionBanner({ goal }: { goal: Goal }) {
             type="button"
             className="mt-0.5 block w-full text-left text-[14.5px] font-medium text-ink"
             onClick={() => setDraft(goal.nextAction)}
-            aria-label="Edit the next single action for the game"
           >
+            {/* The visible text stays part of the name, after what pressing does. */}
+            <span className="sr-only">Edit the next single action for the game: </span>
             {goal.nextAction || (
               <span className="font-normal text-ink-faint">What is the one next step?</span>
             )}

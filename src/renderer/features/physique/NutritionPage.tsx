@@ -170,9 +170,11 @@ export function NutritionPage() {
                 type="button"
                 onClick={() => void quickAdd(f)}
                 className="px-3 py-2 text-left transition-colors hover:bg-accent-soft"
-                aria-label={`Add ${f.name}, ${round(f.calories)} kcal, ${round(f.protein)} g protein`}
               >
-                <div className="text-[13px] font-medium text-ink">{f.name}</div>
+                <div className="text-[13px] font-medium text-ink">
+                  <span className="sr-only">Add </span>
+                  {f.name}
+                </div>
                 <div className="tabular text-[11.5px] text-ink-faint">
                   {round(f.calories)} kcal · {round(f.protein)} g
                   {f.serving ? ` · ${f.serving}` : ''}

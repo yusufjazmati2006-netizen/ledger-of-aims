@@ -252,7 +252,7 @@ export function Palette({
               <button
                 key={g.example}
                 type="button"
-                className="truncate text-left hover:text-ink"
+                className="min-h-[24px] truncate text-left hover:text-ink"
                 onClick={() => {
                   type(`${g.example.split(' ')[0] ?? ''} `);
                   input.current?.focus();

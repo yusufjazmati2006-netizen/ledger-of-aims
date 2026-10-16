@@ -24,5 +24,8 @@ export function useReducedMotion(): boolean {
 
 /** Changes whenever the effective colour scheme flips, so colour reads re-run. */
 export function useColorScheme(): 'light' | 'dark' {
-  return useMediaQuery('(prefers-color-scheme: dark)') ? 'dark' : 'light';
+  const system = useMediaQuery('(prefers-color-scheme: dark)');
+  const theme = useApp((s) => s.settings?.general.theme ?? 'system');
+  if (theme !== 'system') return theme;
+  return system ? 'dark' : 'light';
 }

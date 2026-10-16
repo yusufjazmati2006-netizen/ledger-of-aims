@@ -24,7 +24,9 @@ export async function launchApp(
 ): Promise<Launched> {
   const userData = options.userData ?? tempUserData();
   const backups = join(userData, 'backups');
-  const args = [resolve(__dirname, '../../out/main/index.js')];
+  // LEDGER_E2E_EXECUTABLE runs the suite against a packaged app instead of `out/`.
+  const packaged = process.env.LEDGER_E2E_EXECUTABLE;
+  const args = packaged ? [] : [resolve(__dirname, '../../out/main/index.js')];
   // Chromium refuses to run as root without this (only relevant in CI containers).
   if (process.platform === 'linux' && process.getuid?.() === 0) args.unshift('--no-sandbox');
   const env: Record<string, string> = {};
@@ -32,6 +34,7 @@ export async function launchApp(
     if (v !== undefined && k !== 'ELECTRON_RENDERER_URL') env[k] = v;
   }
   const app = await electron.launch({
+    ...(packaged ? { executablePath: packaged } : {}),
     args,
     env: {
       ...env,
@@ -52,6 +55,16 @@ export async function launchApp(
     if (!next.url().includes('#/quick')) page = next;
   }
   await page.waitForLoadState('domcontentloaded');
+  // Every test, on closing the app, also proves the app made no network request.
+  const close = app.close.bind(app);
+  app.close = async () => {
+    if (!page.isClosed()) {
+      const blocked = await networkLog(page);
+      if (blocked.length > 0)
+        throw new Error(`The app attempted network requests: ${JSON.stringify(blocked)}`);
+    }
+    await close();
+  };
   return { app, page, userData, backups };
 }
 

@@ -454,8 +454,8 @@ function NextAction({ goal }: { goal: Goal }) {
           onClick={() => {
             setDraft(shown);
           }}
-          aria-label={`Edit next single action for ${goal.title}`}
         >
+          <span className="sr-only">Edit next single action for {goal.title}: </span>
           {shown || <span className="text-ink-faint">Add one concrete next step…</span>}
         </button>
       )}

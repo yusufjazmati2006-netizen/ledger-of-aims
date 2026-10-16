@@ -56,6 +56,7 @@ export function BarChartCard({
     >
       <ResponsiveContainer width="100%" height={height}>
         <BarChart
+          accessibilityLayer={false}
           data={rows}
           margin={{ top: 8, right: 8, bottom: 0, left: 0 }}
           barCategoryGap="30%"

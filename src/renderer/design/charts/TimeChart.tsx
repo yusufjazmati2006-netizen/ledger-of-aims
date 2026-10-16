@@ -95,7 +95,11 @@ export function TimeChart({
       }}
     >
       <ResponsiveContainer width="100%" height={height}>
-        <LineChart data={rows} margin={{ top: 22, right: 16, bottom: 0, left: 0 }}>
+        <LineChart
+          accessibilityLayer={false}
+          data={rows}
+          margin={{ top: 22, right: 16, bottom: 0, left: 0 }}
+        >
           <CartesianGrid vertical={false} stroke={c.rule} strokeWidth={1} />
           <XAxis
             dataKey="t"

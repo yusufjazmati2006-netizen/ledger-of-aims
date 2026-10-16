@@ -190,6 +190,8 @@ export const systemSettingsSchema = z.object({
   /** An Electron accelerator; empty disables the shortcut. */
   quickLogShortcut: z.string().max(60).default('Control+Shift+Space'),
   menuBar: z.boolean().default(true),
+  /** macOS login item, so reminders and the daily backup run without remembering to open the app. */
+  openAtLogin: z.boolean().default(false),
 });
 export type SystemSettings = z.infer<typeof systemSettingsSchema>;
 

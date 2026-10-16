@@ -1,7 +1,7 @@
 {
   "name": "ledger-of-aims",
   "productName": "Ledger of Aims",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "A calm, local-first ledger for four long-term goals.",
   "private": true,
   "main": "./out/main/index.js",
@@ -65,10 +65,12 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "electron-vite build && playwright test",
+    "test:offline": "electron-vite build && unshare -rn sh -c 'python3 -I scripts/loopback-up.py && xvfb-run -a playwright test'",
     "check": "npm run typecheck && npm run lint && npm run format:check && npm test",
     "icons": "node scripts/generate-icons.mjs",
     "contrast": "node scripts/check-contrast.mjs",
     "dist": "electron-vite build && electron-builder --mac --universal",
-    "dist:dir": "electron-vite build && electron-builder --dir"
+    "dist:dir": "electron-vite build && electron-builder --dir",
+    "dist:linux": "electron-vite build && electron-builder --linux dir -c.electronDist=node_modules/electron/dist"
   }
 }

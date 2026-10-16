@@ -75,6 +75,7 @@ export default defineConfig({
     resolve: { alias },
     plugins: [react(), tailwindcss(), contentSecurityPolicy()],
     build: {
+      minify: true,
       rolldownOptions: {
         input: {
           index: resolve(__dirname, 'src/renderer/index.html'),

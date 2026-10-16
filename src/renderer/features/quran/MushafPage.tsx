@@ -93,12 +93,8 @@ export function MushafPage() {
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_300px]">
       <div>
         <Legend />
-        <div
-          role="grid"
-          aria-label="Mushaf pages by juz"
-          aria-multiselectable="true"
-          className="flex flex-col gap-5"
-        >
+        {/* One grid per juz (each a single row of pages); arrow keys move across juz. */}
+        <div className="flex flex-col gap-5">
           {quran.juz.map((summary) => {
             const range = quran.layout.juz[summary.juz - 1];
             if (!range) return null;
@@ -130,30 +126,36 @@ export function MushafPage() {
                     Select juz
                   </button>
                 </div>
-                <div role="row" className="grid grid-cols-10 gap-1">
-                  {pages.map((page) => {
-                    const record = byPage.get(page);
-                    return (
-                      <PageCell
-                        key={page}
-                        page={page}
-                        record={record}
-                        today={quran.today}
-                        selected={selected.includes(page)}
-                        focusable={page === focusPage}
-                        hasNote={Boolean(quran.notes[page])}
-                        refCallback={(el) => {
-                          if (el) cellRefs.current.set(page, el);
-                          else cellRefs.current.delete(page);
-                        }}
-                        onSelect={(extend) => {
-                          setFocusPage(page);
-                          selectPage(page, extend);
-                        }}
-                        onKeyDown={(e) => onKeyDown(e, page)}
-                      />
-                    );
-                  })}
+                <div
+                  role="grid"
+                  aria-label={`Pages of juz ${summary.juz}`}
+                  aria-multiselectable="true"
+                >
+                  <div role="row" className="grid grid-cols-10 gap-1">
+                    {pages.map((page) => {
+                      const record = byPage.get(page);
+                      return (
+                        <PageCell
+                          key={page}
+                          page={page}
+                          record={record}
+                          today={quran.today}
+                          selected={selected.includes(page)}
+                          focusable={page === focusPage}
+                          hasNote={Boolean(quran.notes[page])}
+                          refCallback={(el) => {
+                            if (el) cellRefs.current.set(page, el);
+                            else cellRefs.current.delete(page);
+                          }}
+                          onSelect={(extend) => {
+                            setFocusPage(page);
+                            selectPage(page, extend);
+                          }}
+                          onKeyDown={(e) => onKeyDown(e, page)}
+                        />
+                      );
+                    })}
+                  </div>
                 </div>
               </section>
             );

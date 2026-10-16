@@ -124,7 +124,7 @@ function HabitRow({ habit }: { habit: HabitView }) {
               title={`${weekdayShort(d)} ${formatDate(d, { year: false })}`}
               onClick={() => toggle(d)}
               className={cx(
-                'h-5 w-5 rounded-[5px] border transition-colors',
+                'h-[24px] w-[24px] rounded-[5px] border transition-colors',
                 done ? 'border-accent bg-accent' : 'border-rule-strong bg-surface hover:bg-sunken',
                 d === today && 'ring-1 ring-ink-faint ring-offset-1 ring-offset-surface',
               )}

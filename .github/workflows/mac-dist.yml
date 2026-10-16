@@ -1,0 +1,80 @@
+# Builds the universal (Apple silicon + Intel) macOS app on a Mac runner: runs the
+# checks and the end-to-end suite on macOS, packages the .dmg and .zip, verifies the
+# result is universal, and publishes them as downloadable artifacts. Pushing a tag such
+# as v1.0.0 also attaches them to a GitHub release.
+#
+# The build is unsigned (no Apple Developer account is involved); see the README for
+# how to open it the first time.
+name: macOS app
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  dist:
+    runs-on: macos-latest
+    timeout-minutes: 45
+    env:
+      # Unsigned build: do not look for a signing identity in the keychain.
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck, lint, format and unit tests
+        run: npm run check
+
+      - name: End-to-end tests on macOS
+        run: npm run test:e2e
+
+      - name: Package universal .dmg and .zip
+        run: npm run dist
+
+      - name: Verify the app is universal and complete
+        run: |
+          set -euo pipefail
+          VERSION=$(node -p "require('./package.json').version")
+          APP="release/$VERSION/mac-universal/Ledger of Aims.app"
+          lipo -archs "$APP/Contents/MacOS/Ledger of Aims" | tee /dev/stderr | grep -q 'x86_64 arm64'
+          ls "$APP/Contents/Resources/app.asar.unpacked/node_modules/better-sqlite3/prebuilds/" | tee /dev/stderr \
+            | grep -q darwin-arm64
+          test -f "$APP/Contents/Resources/trayTemplate.png"
+          ls -lh release/$VERSION/*.dmg release/$VERSION/*.zip
+
+      - name: Smoke-test the packaged app
+        run: |
+          set -euo pipefail
+          VERSION=$(node -p "require('./package.json').version")
+          LEDGER_E2E_EXECUTABLE="$PWD/release/$VERSION/mac-universal/Ledger of Aims.app/Contents/MacOS/Ledger of Aims" \
+            npx playwright test tests/e2e/onboarding.spec.ts tests/e2e/data.spec.ts
+
+      - name: Upload the app
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ledger-of-Aims-macOS
+          path: |
+            release/*/*.dmg
+            release/*/*.zip
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Attach to the release (tags only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 \
+            || gh release create "$GITHUB_REF_NAME" --title "Ledger of Aims $GITHUB_REF_NAME" --notes-file CHANGELOG.md
+          gh release upload "$GITHUB_REF_NAME" release/*/*.dmg release/*/*.zip --clobber

@@ -11,7 +11,15 @@ Known gaps and follow-ups. Phases refer to the plan in the README.
 - [x] Phase 6 — Today actions, shift-aware planner, weekly review.
 - [x] Phase 7 — Tray, global shortcut, command palettes, notifications.
 - [x] Phase 8 — Backups, JSON import/export, `.ics` export, search.
-- [ ] Phase 9 — Packaging (`npm run dist`), macOS CI, README, full E2E, a11y/perf.
+- [x] Phase 9 — Packaging (`npm run dist`), macOS CI, README, full E2E, a11y/perf.
+
+## Before calling it 1.0
+
+- Push the repository to GitHub and run the **macOS app** workflow; it has been written
+  and its steps exercised on Linux, but has not yet run on a Mac runner.
+- Open the built app on your Mac and look at what Linux could not show: sidebar
+  vibrancy and traffic-light alignment, the menu-bar icon and its running time, the
+  floating quick-log window's translucency, notification banners, and Open at login.
 
 ## Known gaps
 
@@ -22,11 +30,7 @@ Known gaps and follow-ups. Phases refer to the plan in the README.
 - The photos mirror in the backup folder grows with every photo ever added; old photos
   can be removed from it by hand.
 
-- Notifications only appear while the app is running; there is no launch-at-login
-  option yet (macOS can add it under System Settings → General → Login Items).
-- The menu-bar icon, vibrancy of the floating window and notification banners need a
-  first look on a real Mac (development is on Linux, where they are exercised but not
-  seen).
+- Notifications only appear while the app is running (turn on Open at login).
 - Quick log cannot yet log food (`f oats`) or a workout set (`bench 60x8`); both need a
   fuzzy match against your favourites and exercises.
 
@@ -50,7 +54,3 @@ Known gaps and follow-ups. Phases refer to the plan in the README.
   not from the planner's revision block length.
 - Quran: an "Undo" of learned pages does not un-complete a milestone that the change
   completed (by design; untick it on the Milestones screen if needed).
-- macOS-specific visuals (vibrancy, traffic-light alignment) are untested on a real
-  Mac — development happens in a Linux container. Please check on first run.
-- The renderer bundle is ~3 MB in one chunk; route-level code splitting could
-  trim start-up work (low priority for a local app).

@@ -50,8 +50,46 @@
   --accent-soft: var(--surface-sunken);
 }
 
+/* Dark tokens apply when the app's theme is Dark, or when it follows the system and
+   the system is dark. (The explicit attribute matters because not every platform
+   passes Electron's theme choice through to prefers-color-scheme.) */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --paper: #151513;
+  --surface: #1d1c19;
+  --surface-sunken: #11110f;
+  --ink: #ede8de;
+  --ink-muted: #b8b1a4;
+  --ink-faint: #958e81;
+  --rule: #2d2a25;
+  --rule-strong: #48433b;
+  --control: #7a7367;
+  --focus: #86a8ff;
+  --sidebar: #1a1917;
+  --scrim: rgb(0 0 0 / 0.5);
+  --chart-reference: #7a7367;
+
+  --quran: #6cc2ad;
+  --quran-soft: #1a2c27;
+  --physique: #e2ad5c;
+  --physique-soft: #2d2416;
+  --degree: #e98f9e;
+  --degree-soft: #2f1c20;
+  --game: #a6a0f4;
+  --game-soft: #222137;
+
+  --positive: #82c890;
+  --positive-soft: #1b2a1d;
+  --warning: #e9b14f;
+  --warning-soft: #2e2413;
+  --critical: #f28b80;
+  --critical-soft: #331b18;
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+}
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']) {
     --paper: #151513;
     --surface: #1d1c19;
     --surface-sunken: #11110f;
