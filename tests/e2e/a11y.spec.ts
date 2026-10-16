@@ -92,6 +92,13 @@ test('every screen passes axe (WCAG 2.2 A/AA) in light and dark', async () => {
     await call('study.log', { date: '2026-10-14', minutes: 60 });
   });
 
+  // On macOS the sidebar is transparent so the window's vibrancy shows through; axe
+  // cannot see that material and would measure against white. Audit with the opaque
+  // sidebar colour the material stands for (as on other platforms).
+  await page.evaluate(() => {
+    document.documentElement.dataset.platform = 'audit';
+  });
+
   const violations: string[] = [];
   for (const theme of ['light', 'dark'] as const) {
     await page.evaluate(async (t) => {
