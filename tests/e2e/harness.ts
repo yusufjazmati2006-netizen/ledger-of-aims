@@ -1,4 +1,4 @@
-import { _electron as electron, type ElectronApplication, type Page } from '@playwright/test';
+import { _electron as electron, test, type ElectronApplication, type Page } from '@playwright/test';
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
@@ -9,6 +9,24 @@ export interface Launched {
   userData: string;
   backups: string;
 }
+
+/** Apps still open when a test ends (it failed or timed out before closing them). */
+const open = new Set<ElectronApplication>();
+
+/** Stops an app that will not quit (on macOS a stuck app holds the worker open). */
+async function forceClose(app: ElectronApplication): Promise<void> {
+  open.delete(app);
+  const quit = app.close().catch(() => undefined);
+  const timedOut = await Promise.race([
+    quit.then(() => false),
+    new Promise<boolean>((r) => setTimeout(() => r(true), 10_000)),
+  ]);
+  if (timedOut) app.process().kill('SIGKILL');
+}
+
+test.afterEach(async () => {
+  await Promise.all([...open].map(forceClose));
+});
 
 /** A fresh, isolated data folder per test so real data is never touched. */
 export function tempUserData(): string {
@@ -48,6 +66,7 @@ export async function launchApp(
       ...options.env,
     },
   });
+  open.add(app);
   // The main window, not the quick-log window the app also creates.
   let page = app.windows().find((w) => !w.url().includes('#/quick'));
   while (!page) {
@@ -64,6 +83,7 @@ export async function launchApp(
         throw new Error(`The app attempted network requests: ${JSON.stringify(blocked)}`);
     }
     await close();
+    open.delete(app);
   };
   return { app, page, userData, backups };
 }
