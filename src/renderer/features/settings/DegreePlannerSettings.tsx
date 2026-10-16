@@ -221,6 +221,51 @@ export function PlannerSettingsSection() {
           onSave={(v) => save({ minSleepBetweenShiftsHours: v })}
         />
       </div>
+      <div>
+        <h3 className="mb-1 text-[13.5px] font-semibold text-ink">When proposing a week</h3>
+        <p className="mb-4 text-[12.5px] text-ink-muted">
+          Quran times come from Settings → Quran, study from Settings → Degree and game hours from
+          Settings → Game.
+        </p>
+        <div className="grid grid-cols-2 gap-5">
+          <NumberField
+            id="pl-training"
+            label="Training session"
+            suffix="min"
+            value={p.trainingMinutes}
+            min={0}
+            max={240}
+            onSave={(v) => save({ trainingMinutes: v })}
+          />
+          <NumberField
+            id="pl-game"
+            label="Game session"
+            suffix="min"
+            value={p.gameSessionMinutes}
+            min={15}
+            max={240}
+            onSave={(v) => save({ gameSessionMinutes: v })}
+          />
+          <NumberField
+            id="pl-prep"
+            label="Meal prep session"
+            suffix="min"
+            value={p.mealPrepMinutes}
+            min={0}
+            max={240}
+            onSave={(v) => save({ mealPrepMinutes: v })}
+          />
+          <NumberField
+            id="pl-prep-week"
+            label="Meal prep sessions a week"
+            hint="Placed on days off."
+            value={p.mealPrepPerWeek}
+            min={0}
+            max={7}
+            onSave={(v) => save({ mealPrepPerWeek: v })}
+          />
+        </div>
+      </div>
     </div>
   );
 }

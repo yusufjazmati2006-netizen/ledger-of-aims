@@ -17,7 +17,13 @@ import {
   type ShiftType,
   type WeighIn,
 } from '../schemas/core';
-import { idSchema, localDateSchema, patchSchema } from '../schemas/common';
+import {
+  goalIdSchema,
+  idSchema,
+  localDateSchema,
+  patchSchema,
+  textSchema,
+} from '../schemas/common';
 import {
   pageListSchema,
   pageNumberSchema,
@@ -81,6 +87,14 @@ import {
 } from '../schemas/game';
 import type { Dependency } from '../domain/game/roadmap';
 import { settingsSchemas, type SettingsMap } from '../schemas/settings';
+import {
+  habitInputSchema,
+  reviewInputSchema,
+  type Habit,
+  type HabitsData,
+  type WeekMetrics,
+  type WeeklyReview,
+} from '../schemas/review';
 
 /**
  * The single source of truth for main ⇄ renderer communication.
@@ -108,7 +122,9 @@ export type DataDomain =
   | 'photos'
   | 'degree'
   | 'plan'
-  | 'game';
+  | 'game'
+  | 'review'
+  | 'habits';
 
 interface ChannelSpec {
   input: z.ZodType;
@@ -442,6 +458,54 @@ export const contract = {
   'plan.create': { input: planBlockInputSchema, output: out<PlanBlock>(), mutates: ['plan'] },
   'plan.update': { input: planBlockPatchSchema, output: out<PlanBlock>(), mutates: ['plan'] },
   'plan.delete': { input: z.object({ id: idSchema }), output: out<null>(), mutates: ['plan'] },
+  'plan.apply': {
+    input: z.object({
+      from: localDateSchema,
+      to: localDateSchema,
+      blocks: z
+        .array(
+          z.object({
+            date: localDateSchema,
+            start: z.number().int().min(0).max(1439),
+            end: z.number().int().min(1).max(1440),
+            goalId: goalIdSchema,
+            kind: textSchema(30),
+            title: textSchema(120),
+          }),
+        )
+        .max(200),
+    }),
+    output: out<PlanBlock[]>(),
+    mutates: ['plan'],
+  },
+  'plan.clearProposed': {
+    input: z.object({ from: localDateSchema, to: localDateSchema }),
+    output: out<number>(),
+    mutates: ['plan'],
+  },
+
+  // Weekly review and habits
+  'review.get': {
+    input: z.object({ weekStart: localDateSchema }),
+    output: out<WeeklyReview | null>(),
+  },
+  'review.list': { input: z.void(), output: out<WeeklyReview[]>() },
+  'review.metrics': {
+    input: z.object({ weekStart: localDateSchema }),
+    output: out<WeekMetrics>(),
+  },
+  'review.save': { input: reviewInputSchema, output: out<WeeklyReview>(), mutates: ['review'] },
+  'habits.data': {
+    input: z.object({ from: localDateSchema, to: localDateSchema }),
+    output: out<HabitsData>(),
+  },
+  'habits.save': { input: habitInputSchema, output: out<Habit>(), mutates: ['habits'] },
+  'habits.delete': { input: z.object({ id: idSchema }), output: out<null>(), mutates: ['habits'] },
+  'habits.check': {
+    input: z.object({ habitId: idSchema, date: localDateSchema, done: z.boolean() }),
+    output: out<null>(),
+    mutates: ['habits'],
+  },
 
   // Game — roadmap
   'game.roadmap': { input: z.void(), output: out<RoadmapData>() },

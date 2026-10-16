@@ -139,6 +139,11 @@ export const plannerSettingsSchema = z.object({
   dayEnd: z.string().default('23:00'),
   minWindowMinutes: z.number().int().min(5).max(120).default(20),
   minSleepBetweenShiftsHours: z.number().min(4).max(10).default(7),
+  /** Budgets used when proposing a week (Quran and study times live in their own settings). */
+  trainingMinutes: z.number().int().min(0).max(240).default(75),
+  gameSessionMinutes: z.number().int().min(15).max(240).default(60),
+  mealPrepMinutes: z.number().int().min(0).max(240).default(60),
+  mealPrepPerWeek: z.number().int().min(0).max(7).default(1),
 });
 export type PlannerSettings = z.infer<typeof plannerSettingsSchema>;
 

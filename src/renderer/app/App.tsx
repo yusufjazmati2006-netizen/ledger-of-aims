@@ -35,6 +35,11 @@ import { PracticePage } from '../features/game/PracticePage';
 import { TimePage } from '../features/game/TimePage';
 import { DevlogPage } from '../features/game/DevlogPage';
 import { SteamPage } from '../features/game/SteamPage';
+import { PlannerPage } from '../features/planner/PlannerPage';
+import { ReviewPage } from '../features/review/ReviewPage';
+import { ReviewWeekPage } from '../features/review/ReviewWeekPage';
+import { HistoryPage } from '../features/review/HistoryPage';
+import { HabitsPage } from '../features/review/HabitsPage';
 
 const router = createHashRouter([
   {
@@ -83,6 +88,16 @@ const router = createHashRouter([
           { path: 'modules', element: <ModulesPage /> },
           { path: 'calendar', element: <CalendarPage /> },
           { path: 'study', element: <StudyPage /> },
+        ],
+      },
+      { path: 'planner', element: <PlannerPage /> },
+      {
+        path: 'review',
+        element: <ReviewPage />,
+        children: [
+          { index: true, element: <ReviewWeekPage /> },
+          { path: 'history', element: <HistoryPage /> },
+          { path: 'habits', element: <HabitsPage /> },
         ],
       },
       { path: 'milestones', element: <MilestonesPage /> },

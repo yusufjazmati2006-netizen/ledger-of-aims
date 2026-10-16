@@ -34,6 +34,7 @@ import { VERDICT_TONE, verdictHeadline } from '../quran/verdict';
 import { SegmentedControl } from '../../design/Field';
 import { Icon } from '../../design/icons';
 import { toast } from '../../stores/toasts';
+import { HabitsToday, PlannedToday, TodayFocus, WeekPriorities } from './TodayFocus';
 
 export function TodayPage() {
   const today = useToday();
@@ -75,6 +76,17 @@ export function TodayPage() {
           ) : null
         }
       />
+
+      <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-[1.6fr_1fr]">
+        <div className="flex min-w-0 flex-col gap-4">
+          <TodayFocus goals={goals.data ?? []} />
+        </div>
+        <div className="flex min-w-0 flex-col gap-4">
+          <WeekPriorities />
+          <PlannedToday />
+          <HabitsToday />
+        </div>
+      </div>
 
       <section aria-labelledby="goals-heading">
         <h2 id="goals-heading" className="sr-only">

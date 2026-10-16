@@ -1,4 +1,4 @@
-import { addDays } from '@shared/domain/time/localDate';
+import { addDays, localMidnight } from '@shared/domain/time/localDate';
 import type { RepoContext } from '../../db/repositories/context';
 import {
   addDecision,
@@ -35,10 +35,7 @@ import {
 import type { PartialHandlerTable } from '../types';
 
 /** Local midnight of a calendar date, as an ISO instant. */
-function localMidnightIso(date: string): string {
-  const [y, m, d] = date.split('-').map(Number);
-  return new Date(y ?? 1970, (m ?? 1) - 1, d ?? 1).toISOString();
-}
+const localMidnightIso = (date: string) => localMidnight(date).toISOString();
 
 export function gameHandlers(ctx: RepoContext): PartialHandlerTable {
   return {

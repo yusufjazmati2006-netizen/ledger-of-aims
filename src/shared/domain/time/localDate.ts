@@ -195,3 +195,9 @@ export function relativeDays(days: number): string {
   if (days > 0) return `in ${days} days`;
   return `${-days} days ago`;
 }
+
+/** The instant of local midnight at the start of `date`. */
+export function localMidnight(date: LocalDate): Date {
+  const { year, month, day } = parts(date);
+  return new Date(year, month - 1, day);
+}

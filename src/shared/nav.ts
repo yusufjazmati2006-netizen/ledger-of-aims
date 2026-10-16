@@ -15,6 +15,8 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { path: '/game', label: 'Game', goal: 'game' },
   { path: '/degree', label: 'Degree', goal: 'degree' },
   { path: '/physique', label: 'Physique', goal: 'physique' },
+  { path: '/planner', label: 'Planner' },
+  { path: '/review', label: 'Weekly review' },
   { path: '/milestones', label: 'Milestones' },
 ];
 

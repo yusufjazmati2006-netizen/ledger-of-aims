@@ -107,3 +107,39 @@ export function deletePlanBlock(ctx: RepoContext, id: string): void {
   if (ctx.db.prepare('DELETE FROM plan_blocks WHERE id = ?').run(id).changes === 0)
     throw notFound('Plan block', id);
 }
+
+/**
+ * Replaces the proposed (unpinned, unfinished) blocks from `from` to `to` with a new
+ * proposal, atomically. Pinned blocks — ones you placed or moved yourself — and
+ * finished ones are never touched.
+ */
+export function applyProposal(
+  ctx: RepoContext,
+  from: string,
+  to: string,
+  blocks: readonly {
+    date: string;
+    start: number;
+    end: number;
+    goalId: GoalId;
+    kind: string;
+    title: string;
+  }[],
+): PlanBlock[] {
+  ctx.db.transaction(() => {
+    clearProposed(ctx, from, to);
+    for (const b of blocks) {
+      if (b.date < from || b.date > to)
+        throw new DomainError('CONFLICT', 'A proposed block lies outside the week being planned.');
+      createPlanBlock(ctx, { ...b, pinned: false });
+    }
+  })();
+  return listPlanBlocks(ctx, from, to);
+}
+
+/** Removes the proposed (unpinned, unfinished) blocks in a date range. */
+export function clearProposed(ctx: RepoContext, from: string, to: string): number {
+  return ctx.db
+    .prepare('DELETE FROM plan_blocks WHERE date BETWEEN ? AND ? AND pinned = 0 AND done = 0')
+    .run(from, to).changes;
+}

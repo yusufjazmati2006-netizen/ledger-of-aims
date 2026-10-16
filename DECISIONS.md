@@ -145,7 +145,34 @@ reasoning. Anything here can be revisited; most are editable defaults in the app
   against the current Steamworks documentation_; no fee, size or rule is presented as
   current or guaranteed.
 
-## Planner rules (used by study proposals now, the full planner in Phase 6)
+## Today and the week
+
+- **Prioritisation** is transparent and rule-based, not learned: each candidate has a
+  0–100 score (an overdue or imminent deadline 90–95, due revision 82 (+8 with the
+  streak at risk), an overdue session 80, new pages 78 when behind the plan, the
+  weigh-in 70, a due session 68, a habit at risk 64, study and game 38–65 by how much of
+  the week’s target is left). Candidates are packed greedily by score; a candidate
+  that does not fit whole is shortened to its minimum if that fits.
+- **Available time** defaults to the free time left today by the shift rules, from
+  now; the chips override it for the day only and are not stored.
+- **Week proposals** run in a fixed priority order (revision, training, new pages,
+  study, game, meal prep) and leave 10 minutes between blocks. Revision and new pages
+  prefer the earliest window; training and game the latest; study the earliest.
+  Budgets count time already logged this week and blocks already kept.
+- **Kept vs proposed**: an accepted proposal’s blocks are “proposed”; anything you
+  move, add or mark kept is pinned and never replaced. Re-planning replaces proposed,
+  unfinished blocks from today on, atomically.
+- **Keyboard moves** are handled directly rather than with dnd-kit’s keyboard sensor,
+  which scrolls the page instead of moving within a timeline.
+- **Weekly review**: the review of a week sets the priorities for the next; Today shows
+  last week’s. Completing snapshots the figures so history stays accurate if data is
+  later corrected. Early in a week (first two days), an unreviewed last week is offered
+  first.
+- **Habits** are daily with a per-habit grace allowance (default one missed day in any
+  seven). “At risk” means missing today would end the streak, so with grace left a
+  habit is not at risk.
+
+## Planner rules
 
 - Default sleep 8 h, wind-down 30 min, morning routine 30 min, commute 20 min each way,
   30 min recovery after a shift, days run 07:00–23:00.

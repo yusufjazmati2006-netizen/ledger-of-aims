@@ -2,6 +2,56 @@
 
 All notable changes, by phase.
 
+## [0.6.0] — Phase 6: Today, planner, weekly review
+
+### Added
+
+- **Today’s focus**: actions from every goal — due revision, new pages, the weigh-in,
+  a due training session, the nearest deadline (or study if behind), the game’s next
+  task, habits at risk — scored by urgency, how far behind each goal is and streak
+  risk, then packed into the free time left today by your shift pattern, or into
+  15 min / 30 min / 1 h / 2 h. What does not fit is listed under “If you have more
+  time”; one-minute actions are never crowded out.
+- **Planner** (⌘6): a week of day columns showing each shift with its commute, the
+  hours kept for sleep (after a night shift, before a morning one) and every planned
+  block. Shifts are set from the column headers.
+  - **Propose a plan** fills the free windows in priority order — Quran revision,
+    training on its every-other-day rhythm, new pages, the week’s remaining study and
+    game hours, meal prep on a day off — and shows it as a dashed preview to accept or
+    discard. Whatever does not fit is reported.
+  - **Drag to adjust** with the mouse, or from the keyboard (Space to pick up, arrows
+    for 15 minutes or a day, Space to drop, Escape to cancel; Enter edits). A moved or
+    added block is kept by later proposals; **Clear proposed** removes the rest.
+  - **Conflicts** in words: a block on a shift or its commute, in the sleep window, two
+    blocks overlapping (shown side by side), and short sleep between a night and a
+    morning shift.
+  - Finishing a study or game block logs its time.
+- **Weekly review** (⌘7): the week in figures (pages learned and revised, game hours,
+  focus sessions, finished tasks, devlog entries, study, workouts, weigh-ins and the
+  week’s change, plan blocks done, milestones reached), three reflections and three
+  priorities for the next week. Completing it records the figures; a draft can be
+  saved. Last week’s review is offered first early in a week if it was missed.
+  History lists every review.
+- **Habits** with forgiving streaks (0–2 grace days a week each), a 14-day strip to
+  tick or correct past days, archive and restore. Tick them on Today.
+- Today also shows the week’s priorities, today’s planned blocks (tick to finish) and a
+  nudge when a review is due.
+- Settings → Planner: training, game and meal-prep session lengths and meal preps per
+  week.
+- Migration `006_planning` (weekly reviews, habits, habit checks).
+
+### Changed
+
+- The sidebar gains Planner and Weekly review after the four goals, so Milestones
+  moves to ⌘8.
+
+### Tests
+
+- 266 unit tests (week proposals, demands, conflicts, lanes, prioritisation and
+  packing, review metrics, habits, atomic plan replacement) and 12 end-to-end flows,
+  including keyboard dragging and a review whose priorities appear on Today the
+  following Monday.
+
 ## [0.5.0] — Phase 5: Game
 
 ### Added
