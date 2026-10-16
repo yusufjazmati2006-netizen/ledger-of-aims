@@ -86,8 +86,10 @@ test('Physique: weigh-in with undo, training with PRs, nutrition, meal prep and 
     await expect(thumbs).toHaveCount(index + 1);
   }
   await thumbs.nth(0).click();
+  await expect(page.getByRole('button', { pressed: true, name: /pose on/ })).toHaveCount(1);
   await thumbs.nth(1).click();
-  await expect(page.getByRole('heading', { name: '30 days apart' })).toBeVisible();
+  await expect(page.getByRole('button', { pressed: true, name: /pose on/ })).toHaveCount(2);
+  await expect(page.getByRole('heading', { name: /days apart/ })).toHaveText(/30 days apart/);
   const loaded = await page
     .locator('figure img')
     .first()
