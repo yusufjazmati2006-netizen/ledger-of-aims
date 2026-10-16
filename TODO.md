@@ -15,8 +15,9 @@ Known gaps and follow-ups. Phases refer to the plan in the README.
 
 ## Before calling it 1.0
 
-- Push the repository to GitHub and run the **macOS app** workflow; it has been written
-  and its steps exercised on Linux, but has not yet run on a Mac runner.
+- [x] Push the repository to GitHub and run the **macOS app** workflow. It passes on
+      GitHub's Mac runner: full E2E suite, universal (x86_64 + arm64) check, packaged-app
+      smoke test, and the `.dmg`/`.zip` uploaded as the run's artifact.
 - Open the built app on your Mac and look at what Linux could not show: sidebar
   vibrancy and traffic-light alignment, the menu-bar icon and its running time, the
   floating quick-log window's translucency, notification banners, and Open at login.
