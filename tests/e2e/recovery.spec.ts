@@ -1,7 +1,6 @@
-import { expect, test } from '@playwright/test';
 import { copyFileSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { completeOnboarding, launchApp, tempUserData } from './harness';
+import { completeOnboarding, expect, launchApp, tempUserData, test } from './harness';
 
 test('a corrupted database offers recovery and can start fresh without deleting anything', async () => {
   const userData = tempUserData();

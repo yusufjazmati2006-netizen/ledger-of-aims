@@ -1,5 +1,4 @@
-import { expect, test } from '@playwright/test';
-import { completeOnboarding, launchApp, networkLog } from './harness';
+import { completeOnboarding, expect, launchApp, networkLog, test } from './harness';
 
 test('Degree: modules, deadlines, projection, what-I-need, calendar and shift-aware study', async () => {
   const { app, page } = await launchApp();

@@ -1,5 +1,4 @@
-import { expect, test } from '@playwright/test';
-import { completeOnboarding, launchApp } from './harness';
+import { completeOnboarding, expect, launchApp, test } from './harness';
 
 /**
  * Budgets are generous (CI machines and virtual displays are slow); the measured

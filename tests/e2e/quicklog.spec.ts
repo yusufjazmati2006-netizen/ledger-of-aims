@@ -1,5 +1,5 @@
-import { expect, test, type ElectronApplication, type Page } from '@playwright/test';
-import { completeOnboarding, launchApp, networkLog } from './harness';
+import { type ElectronApplication, type Page } from '@playwright/test';
+import { completeOnboarding, expect, launchApp, networkLog, test } from './harness';
 
 const SHOTS = process.env.LEDGER_SCREENSHOTS;
 const MOD = process.platform === 'darwin' ? 'Meta' : 'Control';

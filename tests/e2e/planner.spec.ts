@@ -1,5 +1,4 @@
-import { expect, test } from '@playwright/test';
-import { completeOnboarding, launchApp, networkLog } from './harness';
+import { completeOnboarding, expect, launchApp, networkLog, test } from './harness';
 
 const SHOTS = process.env.LEDGER_SCREENSHOTS;
 

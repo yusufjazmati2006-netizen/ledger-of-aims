@@ -1,7 +1,7 @@
-import { expect, test, type ElectronApplication, type Page } from '@playwright/test';
+import { type ElectronApplication, type Page } from '@playwright/test';
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { completeOnboarding, launchApp, networkLog } from './harness';
+import { completeOnboarding, expect, launchApp, networkLog, test } from './harness';
 
 const SHOTS = process.env.LEDGER_SCREENSHOTS;
 const MOD = process.platform === 'darwin' ? 'Meta' : 'Control';

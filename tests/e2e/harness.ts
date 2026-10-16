@@ -1,4 +1,9 @@
-import { _electron as electron, test, type ElectronApplication, type Page } from '@playwright/test';
+import {
+  _electron as electron,
+  test as base,
+  type ElectronApplication,
+  type Page,
+} from '@playwright/test';
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
@@ -13,20 +18,46 @@ export interface Launched {
 /** Apps still open when a test ends (it failed or timed out before closing them). */
 const open = new Set<ElectronApplication>();
 
-/** Stops an app that will not quit (on macOS a stuck app holds the worker open). */
-async function forceClose(app: ElectronApplication): Promise<void> {
-  open.delete(app);
-  const quit = app.close().catch(() => undefined);
-  const timedOut = await Promise.race([
-    quit.then(() => false),
-    new Promise<boolean>((r) => setTimeout(() => r(true), 10_000)),
-  ]);
-  if (timedOut) app.process().kill('SIGKILL');
+/** Kills the app and its helper processes (Playwright starts it as a process group). */
+function kill(app: ElectronApplication): void {
+  const child = app.process();
+  try {
+    if (child.pid) process.kill(-child.pid, 'SIGKILL');
+  } catch {
+    child.kill('SIGKILL');
+  }
 }
 
-test.afterEach(async () => {
-  await Promise.all([...open].map(forceClose));
+/** Waits for a quit, but never forever: a stuck app would hold the test worker open. */
+async function quitWithin(quit: () => Promise<void>, app: ElectronApplication): Promise<boolean> {
+  const quitted = await Promise.race([
+    quit().then(
+      () => true,
+      () => false,
+    ),
+    new Promise<boolean>((r) => setTimeout(() => r(false), 20_000)),
+  ]);
+  if (!quitted) kill(app);
+  open.delete(app);
+  return quitted;
+}
+
+/**
+ * Use this `test` in every spec: it shuts down any app a test left open (because it
+ * failed or timed out), so one slow test cannot stall the rest of the run.
+ */
+export const test = base.extend<{ closeLeftoverApps: undefined }>({
+  closeLeftoverApps: [
+    // Playwright reads fixture dependencies from this (empty) destructuring.
+    // eslint-disable-next-line no-empty-pattern
+    async ({}, use) => {
+      await use(undefined);
+      await Promise.all([...open].map((app) => quitWithin(() => app.close(), app)));
+    },
+    { auto: true },
+  ],
 });
+export { expect } from '@playwright/test';
 
 /** A fresh, isolated data folder per test so real data is never touched. */
 export function tempUserData(): string {
@@ -82,8 +113,9 @@ export async function launchApp(
       if (blocked.length > 0)
         throw new Error(`The app attempted network requests: ${JSON.stringify(blocked)}`);
     }
-    await close();
-    open.delete(app);
+    if (!(await quitWithin(close, app))) {
+      console.warn('[harness] the app did not quit within 20 s and was stopped');
+    }
   };
   return { app, page, userData, backups };
 }

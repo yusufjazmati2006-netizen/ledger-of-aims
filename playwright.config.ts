@@ -12,6 +12,8 @@ export default defineConfig({
   // On GitHub Actions, failures also appear as annotations on the run.
   reporter: process.env.GITHUB_ACTIONS ? [['list'], ['github']] : [['list']],
   use: {
+    // A stuck click or fill fails at that step, not as an unexplained test timeout.
+    actionTimeout: 20_000,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },

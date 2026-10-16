@@ -1,5 +1,4 @@
-import { expect, test } from '@playwright/test';
-import { completeOnboarding, launchApp, networkLog } from './harness';
+import { completeOnboarding, expect, launchApp, networkLog, test } from './harness';
 
 test('fresh launch: onboarding, seeded goals, and data that survives a restart', async () => {
   const first = await launchApp();

@@ -1,5 +1,4 @@
-import { expect, test } from '@playwright/test';
-import { completeOnboarding, launchApp } from './harness';
+import { completeOnboarding, expect, launchApp, test } from './harness';
 
 test('milestones: add, edit, reorder by keyboard, complete with celebration, delete', async () => {
   const { app, page, userData } = await launchApp();

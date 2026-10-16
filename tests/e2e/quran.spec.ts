@@ -1,5 +1,4 @@
-import { expect, test } from '@playwright/test';
-import { completeOnboarding, launchApp, networkLog } from './harness';
+import { completeOnboarding, expect, launchApp, networkLog, test } from './harness';
 
 test('Quran: verdict, revision with undo, logging pages, mushaf, and an automatic milestone', async () => {
   const { app, page } = await launchApp();
